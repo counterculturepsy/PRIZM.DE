@@ -1,0 +1,57 @@
+# Roadmap and acceptance criteria
+
+## M0 — Architecture and foundation — complete
+
+- Repository boots with supported Node/pnpm and contains no secrets.
+- Current/proposed architecture, full route map, design system, data model, API, AI, environment, testing, and security boundaries are documented.
+- Next.js App Router, strict TypeScript, Tailwind/shadcn-compatible tokens, reusable primitives, Auth.js route, Drizzle/PostgreSQL schema, workspace scope, provider contracts, tests, and CI exist.
+- Lint, typecheck, unit tests, production build, and core smoke E2E pass.
+- M0 UI labels future capabilities honestly; no fake operational metrics or providers.
+
+## M1 — SaaS foundation — implemented, external validation pending
+
+Authenticated users can create/select a workspace, complete onboarding, invite members, and enforce roles. Database-backed sessions/memberships and tenant-isolation integration tests pass. Dashboard and settings have loading, empty, error, mobile, and keyboard states.
+
+Implementation and ephemeral PostgreSQL tests are complete. Applying migrations to managed PostgreSQL and running a real OAuth signup/invitation journey remain deployment-environment gates.
+
+## M2 — Prospect database — implemented, external provider validation pending
+
+Users can import bounded, approved CSV datasets; filter workspace-owned South African company records by keyword, industry, province, and city; save searches; and view profiles with source attribution and confidence. Imports are idempotent and tenant scoped. Live provider-backed discovery remains disabled until a compliant provider, credentials, contractual permissions, and rate limits are configured.
+
+Acceptance evidence: append-only migration `0002`, CSV validation/deduplication unit tests, tenant-isolation/idempotency integration tests, authenticated discovery routes, responsive browser smoke coverage, and a passing production build.
+
+## M3 — Website analysis
+
+Approved crawls run in durable jobs with limits and robots/terms policy. Audits capture evidence, timestamps, scores, partial failures, and accessible reports.
+
+## M4 — Opportunity intelligence
+
+Versioned scoring explains every point. Opportunities link observed evidence to business impact, recommendation, confidence, and non-guaranteed price range.
+
+## M5 — CRM
+
+Leads, contacts, pipeline, activities, notes, tasks, and follow-ups persist with role checks, audit logs, responsive views, and cross-tenant denial tests.
+
+## M6 — AI sales assistant
+
+Strategies and outreach are schema-validated, evidence-grounded drafts with provider budgets, provenance, and mandatory human review.
+
+## M7 — Proposals
+
+Versioned proposals snapshot scope/pricing, require human approval, and export accessibly without representing estimates as guarantees.
+
+## M8 — Campaigns
+
+Integrations, templates, sequences, suppression, unsubscribe, bounce handling, sending caps, deduplication, and auditability are operational before any bulk send.
+
+## M9 — Analytics
+
+Workspace-scoped, reproducible metrics cover sources, funnel, revenue, and cycle time with timezone/currency definitions.
+
+## M10 — Billing
+
+Plans, subscriptions, entitlements, and usage are server-authoritative; signed idempotent webhooks and reconciliation tests pass.
+
+## M11 — Production hardening
+
+Threat review, rate limits, CSP, observability, alerts, backup restore, privacy export/deletion, load testing, dependency scanning, provider production approvals, and independent tenant-isolation QA are complete.

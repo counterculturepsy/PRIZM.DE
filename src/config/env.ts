@@ -10,6 +10,11 @@ const optionalSecret = z.preprocess(
   z.string().min(8).optional(),
 );
 
+const optionalBoolean = z.preprocess(
+  (value) => value === "" || value === undefined ? undefined : value === "true" ? true : value === "false" ? false : value,
+  z.boolean().optional(),
+);
+
 export const serverEnvSchema = z
   .object({
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
@@ -27,6 +32,9 @@ export const serverEnvSchema = z
     OPENAI_API_KEY: optionalSecret,
     ANTHROPIC_API_KEY: optionalSecret,
     GOOGLE_GENERATIVE_AI_API_KEY: optionalSecret,
+    WEBSITE_AUDIT_ENABLED: optionalBoolean.default(false),
+    AUDIT_USER_AGENT: z.preprocess((value) => value === "" ? undefined : value, z.string().min(10).max(300).optional()).default("PRIZMDEV/1.0"),
+    AUDIT_MAX_RESPONSE_BYTES: z.preprocess((value) => value === "" || value === undefined ? undefined : Number(value), z.number().int().min(100_000).max(2_000_000).optional()).default(2_000_000),
   })
   .superRefine((value, context) => {
     const pairs = [

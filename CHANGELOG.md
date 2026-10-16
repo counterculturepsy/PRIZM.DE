@@ -16,3 +16,6 @@ All notable changes follow Keep a Changelog. The project has not released a stab
 - M2 tenant-owned company database, source provenance, discovery-run history, and saved searches
 - Bounded CSV ingestion with allowlisted columns, deterministic deduplication, and import audit events
 - Company discovery filters, saved-search workflow, company profiles, and permission-aware responsive navigation
+- M3 website targets, durable leased audit jobs, page evidence, findings, and versioned diagnostic scores
+- SSRF-aware public destination policy, robots handling, bounded single-page HTTP provider, and disabled-by-default worker
+- Accessible audit request, history, queued/blocked/partial states, and evidence report routes

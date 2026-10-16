@@ -1,6 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = 3100;
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 3100);
+
+if (!Number.isInteger(port) || port < 1 || port > 65_535) {
+  throw new Error("PLAYWRIGHT_PORT must be a valid TCP port.");
+}
 
 export default defineConfig({
   testDir: "./tests/e2e",

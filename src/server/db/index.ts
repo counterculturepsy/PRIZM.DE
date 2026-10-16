@@ -13,3 +13,9 @@ export function getDatabase() {
 }
 
 export type Database = ReturnType<typeof getDatabase>;
+
+export async function closeDatabase(): Promise<void> {
+  if (!globalDatabase.prizmPool) return;
+  await globalDatabase.prizmPool.end();
+  delete globalDatabase.prizmPool;
+}

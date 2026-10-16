@@ -21,10 +21,12 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "env:check": "tsx scripts/validate-env.ts",
+    "audit:worker": "tsx scripts/run-audit-worker.ts",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "1.11.3",
+    "cheerio": "^1.2.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "csv-parse": "^7.0.3",

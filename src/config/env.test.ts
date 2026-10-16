@@ -22,4 +22,9 @@ describe("serverEnvSchema", () => {
     const result = serverEnvSchema.safeParse({ ...valid, DATABASE_URL: "sqlite://local.db" });
     expect(result.success).toBe(false);
   });
+
+  it("rejects ambiguous website audit switches", () => {
+    expect(serverEnvSchema.safeParse({ ...valid, WEBSITE_AUDIT_ENABLED: "yes" }).success).toBe(false);
+    expect(serverEnvSchema.parse({ ...valid, WEBSITE_AUDIT_ENABLED: "false" }).WEBSITE_AUDIT_ENABLED).toBe(false);
+  });
 });

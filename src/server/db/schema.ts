@@ -1,5 +1,6 @@
 import {
   boolean,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -8,6 +9,7 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
@@ -25,6 +27,11 @@ export const invitationStatus = pgEnum("invitation_status", ["pending", "accepte
 export const dataConfidence = pgEnum("data_confidence", ["high", "medium", "low"]);
 export const factKind = pgEnum("fact_kind", ["observed", "user_supplied", "inferred", "unknown"]);
 export const discoveryRunStatus = pgEnum("discovery_run_status", ["running", "completed", "failed"]);
+export const websiteAuditStatus = pgEnum("website_audit_status", ["queued", "running", "completed", "partial", "failed", "blocked"]);
+export const auditJobStatus = pgEnum("audit_job_status", ["queued", "running", "completed", "failed"]);
+export const auditPageStatus = pgEnum("audit_page_status", ["completed", "failed", "blocked"]);
+export const auditFindingSeverity = pgEnum("audit_finding_severity", ["info", "low", "medium", "high"]);
+export const auditFindingCategory = pgEnum("audit_finding_category", ["seo", "accessibility", "performance", "security", "mobile", "content", "technology"]);
 
 export const users = pgTable(
   "users",
@@ -59,6 +66,148 @@ export const accounts = pgTable(
   (table) => [
     primaryKey({ columns: [table.provider, table.providerAccountId] }),
     index("accounts_user_id_idx").on(table.userId),
+  ],
+);
+
+export const websites = pgTable(
+  "websites",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    companyId: uuid("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    normalizedOrigin: text("normalized_origin").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("websites_workspace_id_unique").on(table.workspaceId, table.id),
+    uniqueIndex("websites_workspace_origin_unique").on(table.workspaceId, table.normalizedOrigin),
+    index("websites_workspace_company_idx").on(table.workspaceId, table.companyId),
+    foreignKey({
+      columns: [table.workspaceId, table.companyId],
+      foreignColumns: [companies.workspaceId, companies.id],
+      name: "websites_workspace_company_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const websiteAudits = pgTable(
+  "website_audits",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    websiteId: uuid("website_id").notNull().references(() => websites.id, { onDelete: "cascade" }),
+    requestedByUserId: uuid("requested_by_user_id").notNull().references(() => users.id, { onDelete: "restrict" }),
+    status: websiteAuditStatus("status").default("queued").notNull(),
+    authorizationBasis: text("authorization_basis").notNull(),
+    policyVersion: text("policy_version").default("single-page-v1").notNull(),
+    scoringVersion: text("scoring_version").default("diagnostic-v1").notNull(),
+    robotsAllowed: boolean("robots_allowed"),
+    score: integer("score"),
+    errorCode: text("error_code"),
+    errorMessage: text("error_message"),
+    requestedAt: timestamp("requested_at", { withTimezone: true }).defaultNow().notNull(),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (table) => [
+    unique("website_audits_workspace_id_unique").on(table.workspaceId, table.id),
+    index("website_audits_workspace_status_idx").on(table.workspaceId, table.status, table.requestedAt),
+    index("website_audits_workspace_website_idx").on(table.workspaceId, table.websiteId, table.requestedAt),
+    foreignKey({
+      columns: [table.workspaceId, table.websiteId],
+      foreignColumns: [websites.workspaceId, websites.id],
+      name: "website_audits_workspace_website_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const auditJobs = pgTable(
+  "audit_jobs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    auditId: uuid("audit_id").notNull().references(() => websiteAudits.id, { onDelete: "cascade" }),
+    status: auditJobStatus("status").default("queued").notNull(),
+    attempts: integer("attempts").default(0).notNull(),
+    maxAttempts: integer("max_attempts").default(3).notNull(),
+    runAfter: timestamp("run_after", { withTimezone: true }).defaultNow().notNull(),
+    leaseUntil: timestamp("lease_until", { withTimezone: true }),
+    workerId: text("worker_id"),
+    lastErrorCode: text("last_error_code"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("audit_jobs_workspace_audit_unique").on(table.workspaceId, table.auditId),
+    index("audit_jobs_status_run_after_idx").on(table.status, table.runAfter),
+    foreignKey({
+      columns: [table.workspaceId, table.auditId],
+      foreignColumns: [websiteAudits.workspaceId, websiteAudits.id],
+      name: "audit_jobs_workspace_audit_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const auditPages = pgTable(
+  "audit_pages",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    auditId: uuid("audit_id").notNull().references(() => websiteAudits.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    status: auditPageStatus("status").notNull(),
+    httpStatus: integer("http_status"),
+    contentType: text("content_type"),
+    responseBytes: integer("response_bytes"),
+    durationMs: integer("duration_ms"),
+    title: text("title"),
+    errorCode: text("error_code"),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    unique("audit_pages_workspace_id_unique").on(table.workspaceId, table.id),
+    index("audit_pages_workspace_audit_idx").on(table.workspaceId, table.auditId),
+    foreignKey({
+      columns: [table.workspaceId, table.auditId],
+      foreignColumns: [websiteAudits.workspaceId, websiteAudits.id],
+      name: "audit_pages_workspace_audit_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const auditFindings = pgTable(
+  "audit_findings",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    auditId: uuid("audit_id").notNull().references(() => websiteAudits.id, { onDelete: "cascade" }),
+    pageId: uuid("page_id").references(() => auditPages.id, { onDelete: "cascade" }),
+    category: auditFindingCategory("category").notNull(),
+    code: text("code").notNull(),
+    severity: auditFindingSeverity("severity").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    evidence: text("evidence").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    confidence: dataConfidence("confidence").default("high").notNull(),
+    scoreImpact: integer("score_impact").default(0).notNull(),
+    observedAt: timestamp("observed_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    uniqueIndex("audit_findings_workspace_audit_code_unique").on(table.workspaceId, table.auditId, table.code),
+    index("audit_findings_workspace_audit_idx").on(table.workspaceId, table.auditId, table.severity),
+    foreignKey({
+      columns: [table.workspaceId, table.auditId],
+      foreignColumns: [websiteAudits.workspaceId, websiteAudits.id],
+      name: "audit_findings_workspace_audit_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.workspaceId, table.pageId],
+      foreignColumns: [auditPages.workspaceId, auditPages.id],
+      name: "audit_findings_workspace_page_fk",
+    }).onDelete("cascade"),
   ],
 );
 
@@ -239,6 +388,7 @@ export const companies = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
+    unique("companies_workspace_id_unique").on(table.workspaceId, table.id),
     uniqueIndex("companies_workspace_dedupe_unique").on(table.workspaceId, table.dedupeKey),
     index("companies_workspace_name_idx").on(table.workspaceId, table.name),
     index("companies_workspace_location_idx").on(table.workspaceId, table.province, table.city),
@@ -319,4 +469,9 @@ export const schema = {
   companySources,
   discoveryRuns,
   savedSearches,
+  websites,
+  websiteAudits,
+  auditJobs,
+  auditPages,
+  auditFindings,
 };

@@ -17,6 +17,11 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 - `company_sources`: immutable source attribution, fact kind, confidence, observed time, and constrained snapshot
 - `discovery_runs`: import/provider execution history and result status
 - `saved_searches`: tenant-owned reusable company filters
+- `websites`: canonical tenant/company website targets
+- `website_audits`: authorization basis, policy/scoring versions, lifecycle, score, and sanitized failure state
+- `audit_jobs`: durable leased jobs with bounded attempts and retry scheduling
+- `audit_pages`: response metadata and fetch status without raw HTML
+- `audit_findings`: observed evidence, category, severity, confidence, and score impact
 
 ## Planned domain schema
 
@@ -25,7 +30,7 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 | Profile | `services`, `ideal_customer_profiles`, `onboarding_progress` | implemented; workspace scoped; service slug unique per workspace |
 | Discovery | `companies`, `company_sources`, `discovery_runs`, `saved_searches` | implemented; workspace; company and source keys deduplicated within workspace |
 | Contacts | `contacts`, `suppression_entries` | workspace; source/confidence required; normalized contact hashes indexed |
-| Web intelligence | `websites`, `website_audits`, `audit_findings`, `technologies` | workspace; evidence and observed time required |
+| Web intelligence | `websites`, `website_audits`, `audit_jobs`, `audit_pages`, `audit_findings` | implemented; workspace; evidence, source URL, observed time, policy and scoring versions required |
 | Opportunity | `opportunities`, `leads`, `lead_scores` | workspace; score explanations immutable per scoring version |
 | CRM | `deals`, `activities`, `tasks`, `notes`, `meetings` | workspace; all foreign keys include same-tenant validation |
 | Outreach | `campaigns`, `sequences`, `sequence_steps`, `email_templates`, `messages` | workspace; suppression and human-review checks before send |

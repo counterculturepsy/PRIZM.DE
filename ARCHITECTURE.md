@@ -13,7 +13,7 @@ Browser
         -> domain services
            -> tenant-scoped repositories -> PostgreSQL
            -> provider ports -> compliant external APIs / AI providers
-           -> job port -> future durable worker
+           -> durable PostgreSQL audit queue -> separately scheduled worker
 ```
 
 UI code may call application services but never the database or provider SDKs directly. Provider adapters return attributed, confidence-bearing observations. Domain services convert observations into findings and recommendations. Communication remains draft-only until a human confirms sending.
@@ -45,7 +45,7 @@ Client-supplied workspace IDs are selectors, never proof of access. Future Postg
 | --- | --- | --- | --- |
 | `/` | Public | M0 | Truthful marketing page |
 | `/login` | Public | M0 | OAuth entry and configuration state |
-| `/app` | Authenticated | M0–M2 | Protected shell and dashboard |
+| `/app` | Authenticated | M0–M3 | Protected shell and dashboard |
 | `/app/onboarding` | Member | M1 | Services, regions, ICP, budget |
 | `/app/discover/search` | Member | M2 | Prospect search |
 | `/app/discover/map` | Member | M2 deferred | Geographic view after an approved map provider is configured |
@@ -101,3 +101,5 @@ PRIZM.DEV uses a near-black technical canvas without gaming-style decoration. To
 - **Controlled discovery first:** M2 accepts bounded, explicitly supplied CSV data; provider adapters remain unavailable until approved and configured.
 - **Fail-closed providers:** no provider key means the adapter is unavailable, never a fabricated response.
 - **Jobs behind a port:** queue vendor selection is deferred until M3 workload characteristics are known.
+- **Durable audit queue:** M3 uses leased PostgreSQL jobs with bounded attempts. The worker is separately scheduled and disabled by default, preserving a future move to a dedicated queue without changing the audit domain.
+- **Single-page static audits first:** the approved worker fetches one public HTML document, respects robots policy, pins validated public IPs, revalidates redirects, and never executes JavaScript or follows links.

@@ -13,10 +13,14 @@
 - Dependency lockfile and least-privilege CI permissions
 - Bounded CSV ingestion (1 MB, 500 rows, strict headers and field lengths) with no automatic crawling
 - Deterministic per-workspace company/source deduplication and provenance labels
+- Audit URL allowlisting, public-IP pinning, private/reserved address denial, and redirect revalidation
+- Robots-aware single-page fetches with strict time, redirect, content-type, and byte limits
+- Raw website HTML is analyzed in memory and never persisted
+- Durable audit leases, bounded retries, sanitized error codes, and worker disabled by default
 
 ## Required before production
 
-M2 is not production-ready. Before launch: provision a managed PostgreSQL database, configure and live-test approved OAuth callbacks, add rate limiting and explicit origin review for mutations, select and contractually approve any external discovery provider, establish retention/lawful-basis policy for imported business contacts, add durable audit delivery, encrypted integration-token storage with key rotation, dependency/security scanning, CSP tuned to deployed providers, monitoring, backups and restore drills, privacy workflows, abuse controls, and an external tenant-isolation review.
+M3 is not production-ready. Before launch: provision managed PostgreSQL, configure and live-test OAuth, add rate limiting and explicit origin review for mutations, approve audit-worker egress and DNS controls, publish a crawler contact/policy, configure scheduling and monitoring, review robots/terms/legal policy, select any external discovery provider contractually, establish contact-data retention/lawful basis, add durable audit delivery, encrypted integration-token storage, CSP, backups and restore drills, privacy workflows, abuse controls, and an external tenant-isolation review.
 
 ## Authorization rules
 

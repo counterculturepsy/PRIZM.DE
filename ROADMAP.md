@@ -20,9 +20,11 @@ Users can import bounded, approved CSV datasets; filter workspace-owned South Af
 
 Acceptance evidence: append-only migration `0002`, CSV validation/deduplication unit tests, tenant-isolation/idempotency integration tests, authenticated discovery routes, responsive browser smoke coverage, and a passing production build.
 
-## M3 — Website analysis
+## M3 — Website analysis — implemented, production worker disabled by default
 
-Approved crawls run in durable jobs with limits and robots/terms policy. Audits capture evidence, timestamps, scores, partial failures, and accessible reports.
+Authorized single-page reviews run through durable leased PostgreSQL jobs with retry limits, public-destination enforcement, redirect revalidation, robots policy, byte/time limits, and no link following. Audits capture structured evidence, timestamps, versioned diagnostic scores, partial or blocked states, and accessible reports without retaining raw HTML.
+
+Acceptance evidence: append-only migration `0003`, URL/robots/analyzer unit tests, PGlite queue and cross-tenant integration coverage, authenticated audit list/report routes, and the `audit:worker` entry point. Production processing remains disabled until managed PostgreSQL, approved egress, monitoring, rate limiting, a public crawler contact, and legal/policy review are configured.
 
 ## M4 — Opportunity intelligence
 

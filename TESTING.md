@@ -2,9 +2,9 @@
 
 ## Layers
 
-- Unit: authorization scopes, scoring rules, provider registries, validation
+- Unit: authorization scopes, URL/robots policy, deterministic website analysis, provider registries, validation
 - Component: accessibility and state of reusable UI
-- Integration: generated migrations, PostgreSQL constraints, invitation safety, CSV idempotency, and tenant-scoped queries against ephemeral PGlite (PostgreSQL in WebAssembly)
+- Integration: generated migrations, PostgreSQL constraints, invitation safety, CSV idempotency, durable audit queue lifecycle, and tenant-scoped queries against ephemeral PGlite (PostgreSQL in WebAssembly)
 - API: authentication, authorization, validation, error contracts, idempotency
 - E2E: landing, login, protected redirects, onboarding, discovery, and milestone user journeys
 

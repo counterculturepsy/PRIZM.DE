@@ -6,6 +6,7 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     testTimeout: 15_000,
+    fileParallelism: false,
     setupFiles: ["./vitest.setup.ts"],
     exclude: ["tests/e2e/**", "node_modules/**", ".next/**"],
     coverage: {

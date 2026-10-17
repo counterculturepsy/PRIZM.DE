@@ -17,10 +17,11 @@
 - Robots-aware single-page fetches with strict time, redirect, content-type, and byte limits
 - Raw website HTML is analyzed in memory and never persisted
 - Durable audit leases, bounded retries, sanitized error codes, and worker disabled by default
+- Deterministic opportunity rules, relational evidence provenance, nullable catalogue-backed pricing, and composite tenant constraints
 
 ## Required before production
 
-M3 is not production-ready. Before launch: provision managed PostgreSQL, configure and live-test OAuth, add rate limiting and explicit origin review for mutations, approve audit-worker egress and DNS controls, publish a crawler contact/policy, configure scheduling and monitoring, review robots/terms/legal policy, select any external discovery provider contractually, establish contact-data retention/lawful basis, add durable audit delivery, encrypted integration-token storage, CSP, backups and restore drills, privacy workflows, abuse controls, and an external tenant-isolation review.
+M4 is not production-ready. Before launch: provision managed PostgreSQL, configure and live-test OAuth, add rate limiting and explicit origin review for mutations, approve audit-worker egress and DNS controls, publish a crawler contact/policy, configure scheduling and monitoring, validate scoring against realistic authorized staging data, review robots/terms/legal policy, select any external discovery provider contractually, establish contact-data retention/lawful basis, add encrypted integration-token storage, CSP, backups and restore drills, privacy workflows, abuse controls, and an external tenant-isolation review.
 
 ## Authorization rules
 

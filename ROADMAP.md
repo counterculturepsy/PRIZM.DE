@@ -26,9 +26,11 @@ Authorized single-page reviews run through durable leased PostgreSQL jobs with r
 
 Acceptance evidence: append-only migration `0003`, URL/robots/analyzer unit tests, PGlite queue and cross-tenant integration coverage, authenticated audit list/report routes, and the `audit:worker` entry point. Production processing remains disabled until managed PostgreSQL, approved egress, monitoring, rate limiting, a public crawler contact, and legal/policy review are configured.
 
-## M4 — Opportunity intelligence
+## M4 — Opportunity intelligence — implemented, staging validation pending
 
-Versioned scoring explains every point. Opportunities link observed evidence to business impact, recommendation, confidence, and non-guaranteed price range.
+Versioned deterministic scoring explains every point. Opportunities link observed findings to conservative business impact, recommendations, confidence, and a nullable price range copied only from a matching workspace service. Relational evidence and composite foreign keys enforce tenant and source-audit boundaries; no AI provider or outreach is invoked.
+
+Acceptance evidence: append-only migration `0004`, priority/scoring/generator unit tests, PGlite idempotency and cross-tenant/cross-audit integration coverage, ranked feed and company report routes, and automatic failure-isolated materialization after successful M3 processing. Managed PostgreSQL, realistic staging data, independent tenant-isolation review, monitoring, and policy review remain production gates.
 
 ## M5 — CRM
 

@@ -1,6 +1,6 @@
 # API conventions
 
-Application routes use server components/actions for first-party UI and `/api/v1` route handlers for integrations or explicit HTTP clients. M2 exposes only Auth.js routes and `GET /api/health`; discovery imports and saved searches are authenticated server actions, not public endpoints.
+Application routes use server components/actions for first-party UI and `/api/v1` route handlers for integrations or explicit HTTP clients. The application currently exposes only Auth.js routes and `GET /api/health`; discovery, audit, and opportunity workflows remain authenticated server-side operations rather than public endpoints.
 
 ## M2 action contracts
 
@@ -15,6 +15,13 @@ Application routes use server components/actions for first-party UI and `/api/v1
 - Requests create a durable audit and leased job; they do not perform network work in the browser request.
 - `pnpm audit:worker` processes at most one eligible job. It fails closed unless `WEBSITE_AUDIT_ENABLED=true` and a complete server environment is present.
 - No public worker or crawl endpoint is exposed. Scheduling, concurrency, and rate controls belong to the deployment environment.
+
+## M4 opportunity-intelligence contracts
+
+- Opportunity and score reads are authenticated server-component queries scoped by trusted active workspace membership.
+- Materialization accepts a tenant-owned completed or partial audit ID, performs no provider or AI call, and is idempotent for its scoring/generation version.
+- Every recommendation returns relational source evidence. Price guidance is nullable and may only be copied from an active service configured by the same workspace.
+- Scores describe observable opportunity strength, not website quality, sales probability, or a guaranteed commercial outcome.
 
 Future JSON responses use `{ data, meta }`; errors use `{ error: { code, message, requestId, fieldErrors? } }`. Never return stack traces, SQL details, secrets, provider payloads, or record existence across a tenant boundary.
 

@@ -4,6 +4,7 @@ import { analyzeWebsiteSnapshot } from "@/modules/audits/analyzer";
 import { normalizeAuditUrl } from "@/modules/audits/url-policy";
 import { AuditPolicyError, type WebsiteAuditProvider } from "@/modules/audits/types";
 import { getDatabase } from "@/server/db";
+import { materializeOpportunityIntelligence } from "@/server/opportunities/service";
 import { auditFindings, auditJobs, auditLogs, auditPages, companies, websiteAudits, websites } from "@/server/db/schema";
 
 export class AuditRequestError extends Error {
@@ -125,6 +126,17 @@ export async function processNextAuditJob(provider: WebsiteAuditProvider, worker
         targetId: job.auditId, metadata: { status: finalStatus, score: analysis.score, provider: provider.id },
       });
     });
+    try {
+      await materializeOpportunityIntelligence({ workspaceId: job.workspaceId, auditId: job.auditId });
+    } catch {
+      await db.insert(auditLogs).values({
+        workspaceId: job.workspaceId,
+        action: "opportunity_intelligence.failed",
+        targetType: "website_audit",
+        targetId: job.auditId,
+        metadata: { errorCode: "materialization_failed" },
+      }).catch(() => undefined); // Never downgrade a completed audit because optional intelligence logging failed.
+    }
     return { auditId: job.auditId, status: finalStatus };
   } catch (error) {
     const failure = safeFailure(error);

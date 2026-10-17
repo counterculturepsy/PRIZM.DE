@@ -1,5 +1,7 @@
+import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   foreignKey,
   index,
   integer,
@@ -32,6 +34,15 @@ export const auditJobStatus = pgEnum("audit_job_status", ["queued", "running", "
 export const auditPageStatus = pgEnum("audit_page_status", ["completed", "failed", "blocked"]);
 export const auditFindingSeverity = pgEnum("audit_finding_severity", ["info", "low", "medium", "high"]);
 export const auditFindingCategory = pgEnum("audit_finding_category", ["seo", "accessibility", "performance", "security", "mobile", "content", "technology"]);
+export const leadPriority = pgEnum("lead_priority", ["low", "possible", "good", "high", "priority"]);
+export const opportunityType = pgEnum("opportunity_type", [
+  "website_improvement",
+  "accessibility_remediation",
+  "seo_improvement",
+  "security_hardening",
+  "performance_optimization",
+  "mobile_experience",
+]);
 
 export const users = pgTable(
   "users",
@@ -196,6 +207,7 @@ export const auditFindings = pgTable(
     observedAt: timestamp("observed_at", { withTimezone: true }).notNull(),
   },
   (table) => [
+    unique("audit_findings_workspace_audit_id_unique").on(table.workspaceId, table.auditId, table.id),
     uniqueIndex("audit_findings_workspace_audit_code_unique").on(table.workspaceId, table.auditId, table.code),
     index("audit_findings_workspace_audit_idx").on(table.workspaceId, table.auditId, table.severity),
     foreignKey({
@@ -284,6 +296,7 @@ export const services = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => [
+    unique("services_workspace_id_unique").on(table.workspaceId, table.id),
     uniqueIndex("services_workspace_slug_unique").on(table.workspaceId, table.slug),
     index("services_workspace_active_idx").on(table.workspaceId, table.active),
   ],
@@ -396,6 +409,120 @@ export const companies = pgTable(
   ],
 );
 
+export const leadScores = pgTable(
+  "lead_scores",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    companyId: uuid("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+    auditId: uuid("audit_id").notNull().references(() => websiteAudits.id, { onDelete: "cascade" }),
+    totalScore: integer("total_score").notNull(),
+    priority: leadPriority("priority").notNull(),
+    components: jsonb("components").$type<Array<{
+      key: string;
+      label: string;
+      points: number;
+      maxPoints: number;
+      reason: string;
+      evidenceFindingIds: string[];
+    }>>().default([]).notNull(),
+    scoringVersion: text("scoring_version").default("lead-v1").notNull(),
+    isCurrent: boolean("is_current").default(true).notNull(),
+    sourceCompletedAt: timestamp("source_completed_at", { withTimezone: true }).notNull(),
+    calculatedAt: timestamp("calculated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("lead_scores_workspace_audit_version_unique").on(table.workspaceId, table.auditId, table.scoringVersion),
+    uniqueIndex("lead_scores_workspace_company_current_unique").on(table.workspaceId, table.companyId).where(sql`${table.isCurrent} = true`),
+    index("lead_scores_workspace_priority_idx").on(table.workspaceId, table.priority, table.totalScore, table.calculatedAt),
+    index("lead_scores_workspace_company_idx").on(table.workspaceId, table.companyId, table.calculatedAt),
+    check("lead_scores_total_score_check", sql`${table.totalScore} between 0 and 100`),
+    foreignKey({
+      columns: [table.workspaceId, table.companyId],
+      foreignColumns: [companies.workspaceId, companies.id],
+      name: "lead_scores_workspace_company_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.workspaceId, table.auditId],
+      foreignColumns: [websiteAudits.workspaceId, websiteAudits.id],
+      name: "lead_scores_workspace_audit_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const opportunities = pgTable(
+  "opportunities",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    companyId: uuid("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+    auditId: uuid("audit_id").notNull().references(() => websiteAudits.id, { onDelete: "cascade" }),
+    serviceId: uuid("service_id"),
+    type: opportunityType("type").notNull(),
+    title: text("title").notNull(),
+    summary: text("summary").notNull(),
+    businessImpact: text("business_impact").notNull(),
+    recommendedSolution: text("recommended_solution").notNull(),
+    estimatedValueMinMinor: integer("estimated_value_min_minor"),
+    estimatedValueMaxMinor: integer("estimated_value_max_minor"),
+    currency: text("currency"),
+    confidence: dataConfidence("confidence").default("medium").notNull(),
+    generationVersion: text("generation_version").default("opportunity-v1").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("opportunities_workspace_audit_id_unique").on(table.workspaceId, table.auditId, table.id),
+    uniqueIndex("opportunities_workspace_audit_type_version_unique").on(table.workspaceId, table.auditId, table.type, table.generationVersion),
+    index("opportunities_workspace_company_idx").on(table.workspaceId, table.companyId, table.createdAt),
+    index("opportunities_workspace_type_idx").on(table.workspaceId, table.type, table.createdAt),
+    check("opportunities_value_min_check", sql`${table.estimatedValueMinMinor} is null or ${table.estimatedValueMinMinor} >= 0`),
+    check("opportunities_value_max_check", sql`${table.estimatedValueMaxMinor} is null or ${table.estimatedValueMaxMinor} >= 0`),
+    check("opportunities_value_range_check", sql`${table.estimatedValueMinMinor} is null or ${table.estimatedValueMaxMinor} is null or ${table.estimatedValueMinMinor} <= ${table.estimatedValueMaxMinor}`),
+    check("opportunities_currency_check", sql`(${table.estimatedValueMinMinor} is null and ${table.estimatedValueMaxMinor} is null and ${table.currency} is null) or (${table.currency} is not null and (${table.estimatedValueMinMinor} is not null or ${table.estimatedValueMaxMinor} is not null))`),
+    foreignKey({
+      columns: [table.workspaceId, table.companyId],
+      foreignColumns: [companies.workspaceId, companies.id],
+      name: "opportunities_workspace_company_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.workspaceId, table.auditId],
+      foreignColumns: [websiteAudits.workspaceId, websiteAudits.id],
+      name: "opportunities_workspace_audit_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.workspaceId, table.serviceId],
+      foreignColumns: [services.workspaceId, services.id],
+      name: "opportunities_workspace_service_fk",
+    }).onDelete("restrict"),
+  ],
+);
+
+export const opportunityEvidence = pgTable(
+  "opportunity_evidence",
+  {
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    auditId: uuid("audit_id").notNull().references(() => websiteAudits.id, { onDelete: "cascade" }),
+    opportunityId: uuid("opportunity_id").notNull(),
+    findingId: uuid("finding_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.workspaceId, table.opportunityId, table.findingId] }),
+    index("opportunity_evidence_workspace_audit_idx").on(table.workspaceId, table.auditId),
+    foreignKey({
+      columns: [table.workspaceId, table.auditId, table.opportunityId],
+      foreignColumns: [opportunities.workspaceId, opportunities.auditId, opportunities.id],
+      name: "opportunity_evidence_workspace_audit_opportunity_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.workspaceId, table.auditId, table.findingId],
+      foreignColumns: [auditFindings.workspaceId, auditFindings.auditId, auditFindings.id],
+      name: "opportunity_evidence_workspace_audit_finding_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
 export const companySources = pgTable(
   "company_sources",
   {
@@ -474,4 +601,7 @@ export const schema = {
   auditJobs,
   auditPages,
   auditFindings,
+  leadScores,
+  opportunities,
+  opportunityEvidence,
 };

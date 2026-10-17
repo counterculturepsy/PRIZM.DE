@@ -19,3 +19,6 @@ All notable changes follow Keep a Changelog. The project has not released a stab
 - M3 website targets, durable leased audit jobs, page evidence, findings, and versioned diagnostic scores
 - SSRF-aware public destination policy, robots handling, bounded single-page HTTP provider, and disabled-by-default worker
 - Accessible audit request, history, queued/blocked/partial states, and evidence report routes
+- M4 versioned lead scores, deterministic opportunity rules, same-audit evidence links, and catalogue-backed nullable price guidance
+- Ranked opportunity feed and company opportunity reports with complete score explanations and non-guarantee language
+- Composite PostgreSQL constraints covering M4 company, audit, service, opportunity, and finding relationships

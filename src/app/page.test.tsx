@@ -6,6 +6,6 @@ describe("HomePage", () => {
   it("states the core value without claiming unfinished capabilities are live", () => {
     render(<HomePage />);
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Find your next client");
-    expect(screen.getByText(/controlled discovery and audit queues are live; external providers, audit processing, and sales automation remain disabled by default/i)).toBeInTheDocument();
+    expect(screen.getByText(/controlled discovery, audit queues, and deterministic opportunity scoring are implemented; external providers, production audit processing, and sales automation remain disabled by default/i)).toBeInTheDocument();
   });
 });

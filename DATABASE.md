@@ -22,6 +22,9 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 - `audit_jobs`: durable leased jobs with bounded attempts and retry scheduling
 - `audit_pages`: response metadata and fetch status without raw HTML
 - `audit_findings`: observed evidence, category, severity, confidence, and score impact
+- `lead_scores`: versioned, explainable audit/ICP score history with one current score per company
+- `opportunities`: deterministic recommendations linked to a company, audit, and optional configured service price
+- `opportunity_evidence`: same-tenant, same-audit relational links to source findings
 
 ## Planned domain schema
 
@@ -31,7 +34,7 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 | Discovery | `companies`, `company_sources`, `discovery_runs`, `saved_searches` | implemented; workspace; company and source keys deduplicated within workspace |
 | Contacts | `contacts`, `suppression_entries` | workspace; source/confidence required; normalized contact hashes indexed |
 | Web intelligence | `websites`, `website_audits`, `audit_jobs`, `audit_pages`, `audit_findings` | implemented; workspace; evidence, source URL, observed time, policy and scoring versions required |
-| Opportunity | `opportunities`, `leads`, `lead_scores` | workspace; score explanations immutable per scoring version |
+| Opportunity | `opportunities`, `opportunity_evidence`, `lead_scores` | implemented in M4; workspace/audit evidence constraints; score explanations immutable per version |
 | CRM | `deals`, `activities`, `tasks`, `notes`, `meetings` | workspace; all foreign keys include same-tenant validation |
 | Outreach | `campaigns`, `sequences`, `sequence_steps`, `email_templates`, `messages` | workspace; suppression and human-review checks before send |
 | Proposals | `proposals`, `proposal_items` | workspace; pricing snapshots use integer minor units |

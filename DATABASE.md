@@ -25,6 +25,9 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 - `lead_scores`: versioned, explainable audit/ICP score history with one current score per company
 - `opportunities`: deterministic recommendations linked to a company, audit, and optional configured service price
 - `opportunity_evidence`: same-tenant, same-audit relational links to source findings
+- `leads`, `deals`: one tenant/company lead and its server-authoritative pipeline state
+- `contacts`, `suppression_entries`: attributed business contacts, normalized deduplication, and future-send safety state
+- `crm_notes`, `crm_tasks`, `crm_activities`: bounded notes, follow-ups, and append-only CRM history
 
 ## Planned domain schema
 
@@ -32,10 +35,10 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 | --- | --- | --- |
 | Profile | `services`, `ideal_customer_profiles`, `onboarding_progress` | implemented; workspace scoped; service slug unique per workspace |
 | Discovery | `companies`, `company_sources`, `discovery_runs`, `saved_searches` | implemented; workspace; company and source keys deduplicated within workspace |
-| Contacts | `contacts`, `suppression_entries` | workspace; source/confidence required; normalized contact hashes indexed |
+| Contacts | `contacts`, `suppression_entries` | implemented in M5; workspace/company provenance; normalized values deduplicated; suppression unique per workspace/channel/value |
 | Web intelligence | `websites`, `website_audits`, `audit_jobs`, `audit_pages`, `audit_findings` | implemented; workspace; evidence, source URL, observed time, policy and scoring versions required |
 | Opportunity | `opportunities`, `opportunity_evidence`, `lead_scores` | implemented in M4; workspace/audit evidence constraints; score explanations immutable per version |
-| CRM | `deals`, `activities`, `tasks`, `notes`, `meetings` | workspace; all foreign keys include same-tenant validation |
+| CRM | `leads`, `deals`, `crm_activities`, `crm_tasks`, `crm_notes` | implemented in M5; composite tenant references, one lead/deal per company, append-only history; meetings deferred |
 | Outreach | `campaigns`, `sequences`, `sequence_steps`, `email_templates`, `messages` | workspace; suppression and human-review checks before send |
 | Proposals | `proposals`, `proposal_items` | workspace; pricing snapshots use integer minor units |
 | Platform | `integrations`, `notifications`, `subscriptions`, `usage_records`, `audit_logs` | workspace; integration tokens encrypted and never selected by default |

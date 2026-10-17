@@ -32,9 +32,11 @@ Versioned deterministic scoring explains every point. Opportunities link observe
 
 Acceptance evidence: append-only migration `0004`, priority/scoring/generator unit tests, PGlite idempotency and cross-tenant/cross-audit integration coverage, ranked feed and company report routes, and automatic failure-isolated materialization after successful M3 processing. Managed PostgreSQL, realistic staging data, independent tenant-isolation review, monitoring, and policy review remain production gates.
 
-## M5 — CRM
+## M5 — CRM — implemented, production governance pending
 
-Leads, contacts, pipeline, activities, notes, tasks, and follow-ups persist with role checks, audit logs, responsive views, and cross-tenant denial tests.
+Tenant-owned companies can become deduplicated CRM leads with a deal pipeline, attributed contacts, notes, follow-up tasks, an append-only activity timeline, and workspace-wide suppression records. All writes require role capability checks and atomically record activity and audit metadata. M5 has no outbound sending, automated contact discovery, or calendar integration.
+
+Acceptance evidence: append-only migration `0005`, CRM validation and normalization unit tests, PGlite mutation/idempotency/cross-tenant integration coverage, authenticated responsive CRM routes, and passing production/browser gates. Managed PostgreSQL, lawful-basis and retention policy review, rate limiting, monitoring, backups, and independent tenant-isolation/privacy review remain production gates.
 
 ## M6 — AI sales assistant
 

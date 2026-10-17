@@ -19,7 +19,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md p-7 sm:p-9">
         <Logo />
         <h1 className="mt-10 text-3xl font-semibold tracking-tight">Sign in to your workspace</h1>
-        <p className="mt-3 text-sm leading-6 text-muted-foreground">M0 establishes secure authentication boundaries. Workspace creation and membership provisioning arrive in M1.</p>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">Sign in through a configured OAuth provider to access your isolated workspace, opportunity intelligence, and CRM records.</p>
         <div className="mt-8"><LoginActions providers={providers} /></div>
         <p className="mt-8 text-xs leading-5 text-muted-foreground">By continuing, you agree to use business data responsibly and review generated material before external use.</p>
         <Link className="mt-6 inline-block text-sm text-primary hover:underline" href="/">Back to overview</Link>

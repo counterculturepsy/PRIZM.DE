@@ -22,3 +22,6 @@ All notable changes follow Keep a Changelog. The project has not released a stab
 - M4 versioned lead scores, deterministic opportunity rules, same-audit evidence links, and catalogue-backed nullable price guidance
 - Ranked opportunity feed and company opportunity reports with complete score explanations and non-guarantee language
 - Composite PostgreSQL constraints covering M4 company, audit, service, opportunity, and finding relationships
+- M5 tenant-owned leads, deals, attributed contacts, notes, follow-up tasks, append-only activity, and suppression records
+- Role-aware lead workspace, responsive pipeline, contact directory, task list, and activity timeline routes
+- Transactional CRM activity/audit writes, normalized contact deduplication, idempotent lead creation, and cross-tenant regression coverage

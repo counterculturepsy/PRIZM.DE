@@ -2,11 +2,11 @@
 
 ## Layers
 
-- Unit: authorization scopes, URL/robots policy, deterministic website analysis, opportunity generation, scoring/classification, provider registries, validation
+- Unit: authorization scopes, URL/robots policy, deterministic website analysis, opportunity generation, scoring/classification, CRM validation/normalization/lifecycle rules, provider registries
 - Component: accessibility and state of reusable UI
-- Integration: generated migrations, PostgreSQL constraints, invitation safety, CSV idempotency, durable audit queue lifecycle, opportunity materialization/idempotency, and tenant-scoped queries against ephemeral PGlite (PostgreSQL in WebAssembly)
+- Integration: generated migrations, PostgreSQL constraints, invitation safety, CSV idempotency, durable audit queue lifecycle, opportunity materialization/idempotency, CRM transaction/idempotency/suppression behaviour, and tenant-scoped queries against ephemeral PGlite (PostgreSQL in WebAssembly)
 - API: authentication, authorization, validation, error contracts, idempotency
-- E2E: landing, login, protected redirects, onboarding, discovery, and milestone user journeys
+- E2E: landing, login, protected redirects including CRM, responsive smoke coverage, onboarding, discovery, and milestone user journeys
 
 ## Commands
 

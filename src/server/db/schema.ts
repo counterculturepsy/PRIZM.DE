@@ -43,6 +43,19 @@ export const opportunityType = pgEnum("opportunity_type", [
   "performance_optimization",
   "mobile_experience",
 ]);
+export const leadStatus = pgEnum("lead_status", ["new", "qualified", "unqualified", "converted", "archived"]);
+export const dealStage = pgEnum("deal_stage", ["identified", "contacted", "discovery", "proposal", "negotiation", "won", "lost"]);
+export const crmActivityType = pgEnum("crm_activity_type", [
+  "lead_created",
+  "stage_changed",
+  "note_added",
+  "contact_added",
+  "task_created",
+  "task_completed",
+  "contact_suppressed",
+]);
+export const crmTaskStatus = pgEnum("crm_task_status", ["open", "completed", "cancelled"]);
+export const contactChannel = pgEnum("contact_channel", ["email", "phone"]);
 
 export const users = pgTable(
   "users",
@@ -473,6 +486,7 @@ export const opportunities = pgTable(
   },
   (table) => [
     unique("opportunities_workspace_audit_id_unique").on(table.workspaceId, table.auditId, table.id),
+    unique("opportunities_workspace_company_id_unique").on(table.workspaceId, table.companyId, table.id),
     uniqueIndex("opportunities_workspace_audit_type_version_unique").on(table.workspaceId, table.auditId, table.type, table.generationVersion),
     index("opportunities_workspace_company_idx").on(table.workspaceId, table.companyId, table.createdAt),
     index("opportunities_workspace_type_idx").on(table.workspaceId, table.type, table.createdAt),
@@ -520,6 +534,197 @@ export const opportunityEvidence = pgTable(
       foreignColumns: [auditFindings.workspaceId, auditFindings.auditId, auditFindings.id],
       name: "opportunity_evidence_workspace_audit_finding_fk",
     }).onDelete("cascade"),
+  ],
+);
+
+export const leads = pgTable(
+  "leads",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    companyId: uuid("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+    sourceOpportunityId: uuid("source_opportunity_id"),
+    ownerUserId: uuid("owner_user_id"),
+    status: leadStatus("status").default("new").notNull(),
+    title: text("title").notNull(),
+    qualificationReason: text("qualification_reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("leads_workspace_id_unique").on(table.workspaceId, table.id),
+    unique("leads_workspace_company_id_unique").on(table.workspaceId, table.companyId, table.id),
+    uniqueIndex("leads_workspace_company_unique").on(table.workspaceId, table.companyId),
+    index("leads_workspace_status_idx").on(table.workspaceId, table.status, table.updatedAt),
+    foreignKey({
+      columns: [table.workspaceId, table.companyId],
+      foreignColumns: [companies.workspaceId, companies.id],
+      name: "leads_workspace_company_fk",
+    }).onDelete("cascade"),
+    foreignKey({
+      columns: [table.workspaceId, table.companyId, table.sourceOpportunityId],
+      foreignColumns: [opportunities.workspaceId, opportunities.companyId, opportunities.id],
+      name: "leads_workspace_company_opportunity_fk",
+    }).onDelete("restrict"),
+    foreignKey({
+      columns: [table.workspaceId, table.ownerUserId],
+      foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId],
+      name: "leads_workspace_owner_fk",
+    }).onDelete("restrict"),
+  ],
+);
+
+export const contacts = pgTable(
+  "contacts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    companyId: uuid("company_id").notNull().references(() => companies.id, { onDelete: "cascade" }),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name"),
+    roleTitle: text("role_title"),
+    email: text("email"),
+    normalizedEmail: text("normalized_email"),
+    phone: text("phone"),
+    normalizedPhone: text("normalized_phone"),
+    sourceKind: factKind("source_kind").default("user_supplied").notNull(),
+    sourceLabel: text("source_label").notNull(),
+    sourceUrl: text("source_url"),
+    confidence: dataConfidence("confidence").default("medium").notNull(),
+    observedAt: timestamp("observed_at", { withTimezone: true }).notNull(),
+    doNotContact: boolean("do_not_contact").default(false).notNull(),
+    createdByUserId: uuid("created_by_user_id").notNull().references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("contacts_workspace_id_unique").on(table.workspaceId, table.id),
+    index("contacts_workspace_company_idx").on(table.workspaceId, table.companyId, table.createdAt),
+    uniqueIndex("contacts_workspace_company_email_unique").on(table.workspaceId, table.companyId, table.normalizedEmail).where(sql`${table.normalizedEmail} is not null`),
+    uniqueIndex("contacts_workspace_company_phone_unique").on(table.workspaceId, table.companyId, table.normalizedPhone).where(sql`${table.normalizedPhone} is not null`),
+    check("contacts_contact_method_check", sql`${table.normalizedEmail} is not null or ${table.normalizedPhone} is not null`),
+    foreignKey({
+      columns: [table.workspaceId, table.companyId],
+      foreignColumns: [companies.workspaceId, companies.id],
+      name: "contacts_workspace_company_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const deals = pgTable(
+  "deals",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    leadId: uuid("lead_id").notNull(),
+    stage: dealStage("stage").default("identified").notNull(),
+    valueMinor: integer("value_minor"),
+    currency: text("currency").notNull(),
+    expectedCloseAt: timestamp("expected_close_at", { withTimezone: true }),
+    closedAt: timestamp("closed_at", { withTimezone: true }),
+    lostReason: text("lost_reason"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("deals_workspace_id_unique").on(table.workspaceId, table.id),
+    uniqueIndex("deals_workspace_lead_unique").on(table.workspaceId, table.leadId),
+    index("deals_workspace_stage_idx").on(table.workspaceId, table.stage, table.updatedAt),
+    check("deals_value_check", sql`${table.valueMinor} is null or ${table.valueMinor} >= 0`),
+    check("deals_currency_check", sql`char_length(${table.currency}) = 3`),
+    foreignKey({
+      columns: [table.workspaceId, table.leadId],
+      foreignColumns: [leads.workspaceId, leads.id],
+      name: "deals_workspace_lead_fk",
+    }).onDelete("cascade"),
+  ],
+);
+
+export const crmNotes = pgTable(
+  "crm_notes",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    leadId: uuid("lead_id").notNull(),
+    authorUserId: uuid("author_user_id").notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("crm_notes_workspace_lead_idx").on(table.workspaceId, table.leadId, table.createdAt),
+    check("crm_notes_body_check", sql`char_length(${table.body}) between 1 and 2000`),
+    foreignKey({ columns: [table.workspaceId, table.leadId], foreignColumns: [leads.workspaceId, leads.id], name: "crm_notes_workspace_lead_fk" }).onDelete("cascade"),
+    foreignKey({ columns: [table.workspaceId, table.authorUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "crm_notes_workspace_author_fk" }).onDelete("restrict"),
+  ],
+);
+
+export const crmTasks = pgTable(
+  "crm_tasks",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    leadId: uuid("lead_id").notNull(),
+    assignedToUserId: uuid("assigned_to_user_id"),
+    createdByUserId: uuid("created_by_user_id").notNull(),
+    title: text("title").notNull(),
+    description: text("description"),
+    dueAt: timestamp("due_at", { withTimezone: true }),
+    status: crmTaskStatus("status").default("open").notNull(),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    unique("crm_tasks_workspace_id_unique").on(table.workspaceId, table.id),
+    index("crm_tasks_workspace_status_due_idx").on(table.workspaceId, table.status, table.dueAt),
+    index("crm_tasks_workspace_lead_idx").on(table.workspaceId, table.leadId, table.createdAt),
+    check("crm_tasks_title_check", sql`char_length(${table.title}) between 1 and 160`),
+    foreignKey({ columns: [table.workspaceId, table.leadId], foreignColumns: [leads.workspaceId, leads.id], name: "crm_tasks_workspace_lead_fk" }).onDelete("cascade"),
+    foreignKey({ columns: [table.workspaceId, table.assignedToUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "crm_tasks_workspace_assignee_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [table.workspaceId, table.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "crm_tasks_workspace_creator_fk" }).onDelete("restrict"),
+  ],
+);
+
+export const crmActivities = pgTable(
+  "crm_activities",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    leadId: uuid("lead_id").notNull(),
+    contactId: uuid("contact_id"),
+    actorUserId: uuid("actor_user_id").notNull(),
+    type: crmActivityType("type").notNull(),
+    summary: text("summary").notNull(),
+    occurredAt: timestamp("occurred_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    index("crm_activities_workspace_occurred_idx").on(table.workspaceId, table.occurredAt),
+    index("crm_activities_workspace_lead_idx").on(table.workspaceId, table.leadId, table.occurredAt),
+    check("crm_activities_summary_check", sql`char_length(${table.summary}) between 1 and 500`),
+    foreignKey({ columns: [table.workspaceId, table.leadId], foreignColumns: [leads.workspaceId, leads.id], name: "crm_activities_workspace_lead_fk" }).onDelete("cascade"),
+    foreignKey({ columns: [table.workspaceId, table.contactId], foreignColumns: [contacts.workspaceId, contacts.id], name: "crm_activities_workspace_contact_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [table.workspaceId, table.actorUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "crm_activities_workspace_actor_fk" }).onDelete("restrict"),
+  ],
+);
+
+export const suppressionEntries = pgTable(
+  "suppression_entries",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+    contactId: uuid("contact_id"),
+    channel: contactChannel("channel").notNull(),
+    normalizedValue: text("normalized_value").notNull(),
+    reason: text("reason").notNull(),
+    createdByUserId: uuid("created_by_user_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [
+    uniqueIndex("suppression_entries_workspace_channel_value_unique").on(table.workspaceId, table.channel, table.normalizedValue),
+    index("suppression_entries_workspace_contact_idx").on(table.workspaceId, table.contactId),
+    check("suppression_entries_reason_check", sql`char_length(${table.reason}) between 2 and 500`),
+    foreignKey({ columns: [table.workspaceId, table.contactId], foreignColumns: [contacts.workspaceId, contacts.id], name: "suppression_entries_workspace_contact_fk" }).onDelete("restrict"),
+    foreignKey({ columns: [table.workspaceId, table.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "suppression_entries_workspace_creator_fk" }).onDelete("restrict"),
   ],
 );
 
@@ -604,4 +809,11 @@ export const schema = {
   leadScores,
   opportunities,
   opportunityEvidence,
+  leads,
+  contacts,
+  deals,
+  crmNotes,
+  crmTasks,
+  crmActivities,
+  suppressionEntries,
 };

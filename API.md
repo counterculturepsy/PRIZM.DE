@@ -23,6 +23,14 @@ Application routes use server components/actions for first-party UI and `/api/v1
 - Every recommendation returns relational source evidence. Price guidance is nullable and may only be copied from an active service configured by the same workspace.
 - Scores describe observable opportunity strength, not website quality, sales probability, or a guaranteed commercial outcome.
 
+## M5 CRM contracts
+
+- CRM reads require active workspace membership. Mutations additionally require workspace `write` capability, so Viewer remains read-only.
+- Lead creation accepts only a company owned by the active workspace and an optional same-company, same-workspace opportunity. Repeated creation returns the existing lead rather than duplicating it.
+- Contact creation requires explicit source metadata and at least one bounded email or phone value. PRIZM does not discover, enrich, or verify the legal usability of contact data in M5.
+- Deal stage, note, task, completion, and suppression mutations transactionally record an append-only CRM activity and audit-log event.
+- Suppression stores a normalized workspace-wide channel/value pair for future M8 enforcement. M5 exposes no send action or provider callback.
+
 Future JSON responses use `{ data, meta }`; errors use `{ error: { code, message, requestId, fieldErrors? } }`. Never return stack traces, SQL details, secrets, provider payloads, or record existence across a tenant boundary.
 
 Mutations validate content type, body size, origin where appropriate, Zod schema, authenticated membership, capability, rate limit, and idempotency key where retries are possible. Pagination uses opaque cursors. Dates are ISO 8601 UTC. Money is integer minor units plus currency. Externally visible IDs are opaque UUIDs.

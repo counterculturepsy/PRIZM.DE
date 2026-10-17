@@ -18,10 +18,11 @@
 - Raw website HTML is analyzed in memory and never persisted
 - Durable audit leases, bounded retries, sanitized error codes, and worker disabled by default
 - Deterministic opportunity rules, relational evidence provenance, nullable catalogue-backed pricing, and composite tenant constraints
+- Tenant-scoped CRM references, attributed contact entry, normalized suppression records, transactional activity/audit writes, and read-only Viewer enforcement
 
 ## Required before production
 
-M4 is not production-ready. Before launch: provision managed PostgreSQL, configure and live-test OAuth, add rate limiting and explicit origin review for mutations, approve audit-worker egress and DNS controls, publish a crawler contact/policy, configure scheduling and monitoring, validate scoring against realistic authorized staging data, review robots/terms/legal policy, select any external discovery provider contractually, establish contact-data retention/lawful basis, add encrypted integration-token storage, CSP, backups and restore drills, privacy workflows, abuse controls, and an external tenant-isolation review.
+M5 is not production-ready. Before launch: provision managed PostgreSQL, configure and live-test OAuth, add rate limiting and explicit origin review for mutations, approve audit-worker egress and DNS controls, publish a crawler contact/policy, configure scheduling and monitoring, validate scoring and CRM workflows against realistic authorized staging data, review robots/terms/legal policy, select any external discovery provider contractually, establish contact-data retention/lawful basis and subject-rights workflows, add encrypted integration-token storage, CSP, backups and restore drills, privacy workflows, abuse controls, and an external tenant-isolation/privacy review.
 
 ## Authorization rules
 

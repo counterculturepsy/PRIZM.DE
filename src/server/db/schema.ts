@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import type { SalesDraft, SalesEvidence } from "@/modules/ai/sales";
+import type { ProposalSnapshot } from "@/modules/proposals/validation";
 import {
   boolean,
   check,
@@ -829,6 +830,48 @@ export const aiDraftRuns = pgTable("ai_draft_runs", {
   check("ai_runs_review_check", sql`(${table.reviewStatus} = 'pending' and ${table.reviewedAt} is null and ${table.reviewerUserId} is null) or (${table.status} = 'completed' and ${table.reviewedAt} is not null and ${table.reviewerUserId} is not null)`),
 ]);
 
+export const proposalStatus = pgEnum("proposal_status", ["draft", "approved", "declined", "expired", "superseded"]);
+export const proposals = pgTable("proposals", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  leadId: uuid("lead_id").notNull(),
+  requestKey: uuid("request_key").notNull(),
+  title: text("title").notNull(),
+  status: proposalStatus("status").default("draft").notNull(),
+  currentVersion: integer("current_version").default(1).notNull(),
+  createdByUserId: uuid("created_by_user_id").notNull(),
+  approvedByUserId: uuid("approved_by_user_id"),
+  approvalNote: text("approval_note"),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  unique("proposals_workspace_id_unique").on(table.workspaceId, table.id),
+  uniqueIndex("proposals_workspace_request_unique").on(table.workspaceId, table.requestKey),
+  index("proposals_workspace_lead_idx").on(table.workspaceId, table.leadId, table.updatedAt),
+  check("proposals_version_check", sql`${table.currentVersion} >= 1`),
+  check("proposals_approval_check", sql`(${table.status} = 'approved' and ${table.approvedAt} is not null and ${table.approvedByUserId} is not null and ${table.approvalNote} is not null) or (${table.status} <> 'approved' and ${table.approvedAt} is null and ${table.approvedByUserId} is null and ${table.approvalNote} is null)`),
+  foreignKey({ columns: [table.workspaceId, table.leadId], foreignColumns: [leads.workspaceId, leads.id], name: "proposals_workspace_lead_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [table.workspaceId, table.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "proposals_workspace_creator_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [table.workspaceId, table.approvedByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "proposals_workspace_approver_fk" }).onDelete("restrict"),
+]);
+
+export const proposalVersions = pgTable("proposal_versions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  proposalId: uuid("proposal_id").notNull(),
+  version: integer("version").notNull(),
+  snapshot: jsonb("snapshot").$type<ProposalSnapshot>().notNull(),
+  createdByUserId: uuid("created_by_user_id").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+  uniqueIndex("proposal_versions_workspace_proposal_version_unique").on(table.workspaceId, table.proposalId, table.version),
+  index("proposal_versions_workspace_created_idx").on(table.workspaceId, table.createdAt),
+  check("proposal_versions_version_check", sql`${table.version} >= 1`),
+  foreignKey({ columns: [table.workspaceId, table.proposalId], foreignColumns: [proposals.workspaceId, proposals.id], name: "proposal_versions_workspace_proposal_fk" }).onDelete("cascade"),
+  foreignKey({ columns: [table.workspaceId, table.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "proposal_versions_workspace_creator_fk" }).onDelete("restrict"),
+]);
+
 export const schema = {
   users,
   accounts,
@@ -862,4 +905,6 @@ export const schema = {
   suppressionEntries,
   aiWorkspacePolicies,
   aiDraftRuns,
+  proposals,
+  proposalVersions,
 };

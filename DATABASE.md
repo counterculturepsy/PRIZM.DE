@@ -30,6 +30,8 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 - `crm_notes`, `crm_tasks`, `crm_activities`: bounded notes, follow-ups, and append-only CRM history
 - `ai_workspace_policies`: disabled-by-default workspace policy and bounded UTC daily request limit
 - `ai_draft_runs`: tenant-owned quota reservations, immutable redacted evidence snapshots, structured output, provider provenance, usage, safe failure state, and conditional human review
+- `proposals`: tenant/lead-owned proposal identity, current version, lifecycle, creator and conditional approval metadata
+- `proposal_versions`: append-only client-visible scope, deliverables, terms guidance, line items and server-authoritative pricing snapshots
 
 ## Planned domain schema
 
@@ -42,6 +44,7 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 | Opportunity | `opportunities`, `opportunity_evidence`, `lead_scores` | implemented in M4; workspace/audit evidence constraints; score explanations immutable per version |
 | CRM | `leads`, `deals`, `crm_activities`, `crm_tasks`, `crm_notes` | implemented in M5; composite tenant references, one lead/deal per company, append-only history; meetings deferred |
 | AI drafts | `ai_workspace_policies`, `ai_draft_runs` | implemented in M6; workspace/lead/member composite references, request-key idempotency, bounded evidence snapshots, provider provenance, and review-only lifecycle |
+| Proposals | `proposals`, `proposal_versions` | implemented in M7; workspace/lead/member composite references, idempotent creation, serialized append-only versions, server-calculated totals, and privileged approval |
 | Outreach | `campaigns`, `sequences`, `sequence_steps`, `email_templates`, `messages` | workspace; suppression and human-review checks before send |
 | Proposals | `proposals`, `proposal_items` | workspace; pricing snapshots use integer minor units |
 | Platform | `integrations`, `notifications`, `subscriptions`, `usage_records`, `audit_logs` | workspace; integration tokens encrypted and never selected by default |

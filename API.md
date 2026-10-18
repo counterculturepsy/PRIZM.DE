@@ -39,6 +39,14 @@ Application routes use server components/actions for first-party UI and `/api/v1
 - Provider responses use strict structured output, secondary schema validation, and an evidence-ID allowlist. Refusal, incomplete, oversized, malformed, timeout, and network failures fail closed with sanitized codes.
 - Draft review is a conditional, audited transition available to members with `write` capability. Approval records human review only; M6 exposes no send endpoint or integration callback.
 
+## M7 proposal contracts
+
+- Proposal creation and revision require workspace `write` capability and a tenant-owned CRM lead. Request keys make proposal creation idempotent.
+- Proposal versions are append-only snapshots. A revision is serialized under a proposal row lock, increments the version, and returns the proposal to draft without changing earlier snapshots.
+- Workspace currency is authoritative. The server validates quantity, unit amount and discount, calculates every line total and aggregate, and accepts no browser-supplied totals.
+- Only Owner/Admin may conditionally approve the current draft. Approval records reviewer, note, timestamp, version and audit metadata; any revision requires approval again.
+- Print routes render the tenant-scoped immutable snapshot and label it as a proposal rather than an invoice or guarantee. M7 exposes no public link, signature, payment or send endpoint.
+
 Future JSON responses use `{ data, meta }`; errors use `{ error: { code, message, requestId, fieldErrors? } }`. Never return stack traces, SQL details, secrets, provider payloads, or record existence across a tenant boundary.
 
 Mutations validate content type, body size, origin where appropriate, Zod schema, authenticated membership, capability, rate limit, and idempotency key where retries are possible. Pagination uses opaque cursors. Dates are ISO 8601 UTC. Money is integer minor units plus currency. Externally visible IDs are opaque UUIDs.

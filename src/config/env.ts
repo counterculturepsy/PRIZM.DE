@@ -30,6 +30,8 @@ export const serverEnvSchema = z
     AUTH_GOOGLE_SECRET: optionalSecret,
     INTEGRATION_ENCRYPTION_KEY: optionalSecret,
     OPENAI_API_KEY: optionalSecret,
+    AI_GENERATION_ENABLED: optionalBoolean.default(false),
+    OPENAI_MODEL: z.preprocess((value) => value === "" ? undefined : value, z.string().regex(/^[a-zA-Z0-9._-]{1,100}$/).optional()),
     ANTHROPIC_API_KEY: optionalSecret,
     GOOGLE_GENERATIVE_AI_API_KEY: optionalSecret,
     WEBSITE_AUDIT_ENABLED: optionalBoolean.default(false),
@@ -37,6 +39,9 @@ export const serverEnvSchema = z
     AUDIT_MAX_RESPONSE_BYTES: z.preprocess((value) => value === "" || value === undefined ? undefined : Number(value), z.number().int().min(100_000).max(2_000_000).optional()).default(2_000_000),
   })
   .superRefine((value, context) => {
+    if (value.AI_GENERATION_ENABLED && (!value.OPENAI_API_KEY || !value.OPENAI_MODEL)) {
+      context.addIssue({ code: "custom", path: ["AI_GENERATION_ENABLED"], message: "Enabled AI requires an OpenAI key and explicit model." });
+    }
     const pairs = [
       ["AUTH_GITHUB_ID", "AUTH_GITHUB_SECRET"],
       ["AUTH_GOOGLE_ID", "AUTH_GOOGLE_SECRET"],

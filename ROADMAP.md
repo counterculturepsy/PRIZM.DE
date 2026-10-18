@@ -38,9 +38,11 @@ Tenant-owned companies can become deduplicated CRM leads with a deal pipeline, a
 
 Acceptance evidence: append-only migration `0005`, CRM validation and normalization unit tests, PGlite mutation/idempotency/cross-tenant integration coverage, authenticated responsive CRM routes, and passing production/browser gates. Managed PostgreSQL, lawful-basis and retention policy review, rate limiting, monitoring, backups, and independent tenant-isolation/privacy review remain production gates.
 
-## M6 — AI sales assistant
+## M6 — AI sales assistant — implemented, external provider validation pending
 
-Strategies and outreach are schema-validated, evidence-grounded drafts with provider budgets, provenance, and mandatory human review.
+Strategies and outreach are schema-validated, evidence-grounded drafts with provider budgets, provenance, and mandatory human review. The provider and workspace policy both default to disabled, every request reserves quota, and approval records review only; M6 has no send operation.
+
+Acceptance evidence: append-only migration `0006`, redaction/grounding/provider unit tests, PGlite quota/idempotency/tenant/role/review coverage, authenticated strategy/outreach/review/policy routes, and fail-closed environment validation. Approved model selection, lawful-use and data-processing review, authorized staging evaluation, managed PostgreSQL/OAuth validation, monitoring, and production governance remain external gates.
 
 ## M7 — Proposals
 

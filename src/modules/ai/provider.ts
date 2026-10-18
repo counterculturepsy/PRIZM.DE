@@ -20,6 +20,8 @@ export type AIResult<TOutput> = Readonly<{
   model: string;
   promptVersion: string;
   durationMs: number;
+  inputTokens?: number | undefined;
+  outputTokens?: number | undefined;
 }>;
 
 export interface AIProvider {

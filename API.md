@@ -31,6 +31,14 @@ Application routes use server components/actions for first-party UI and `/api/v1
 - Deal stage, note, task, completion, and suppression mutations transactionally record an append-only CRM activity and audit-log event.
 - Suppression stores a normalized workspace-wide channel/value pair for future M8 enforcement. M5 exposes no send action or provider callback.
 
+## M6 AI sales-assistant contracts
+
+- Strategy and outreach generation are authenticated server actions requiring workspace `write` capability, explicit evidence-transfer acknowledgement, and a tenant-owned CRM lead.
+- The server selects and redacts current audit evidence. Browser-supplied evidence, provider/model names, workspace IDs, prompt text, totals, and review state are not trusted.
+- AI must be enabled by both validated server configuration and an Owner/Admin workspace policy. A workspace row lock serializes idempotency and UTC daily-budget reservation before a provider call.
+- Provider responses use strict structured output, secondary schema validation, and an evidence-ID allowlist. Refusal, incomplete, oversized, malformed, timeout, and network failures fail closed with sanitized codes.
+- Draft review is a conditional, audited transition available to members with `write` capability. Approval records human review only; M6 exposes no send endpoint or integration callback.
+
 Future JSON responses use `{ data, meta }`; errors use `{ error: { code, message, requestId, fieldErrors? } }`. Never return stack traces, SQL details, secrets, provider payloads, or record existence across a tenant boundary.
 
 Mutations validate content type, body size, origin where appropriate, Zod schema, authenticated membership, capability, rate limit, and idempotency key where retries are possible. Pagination uses opaque cursors. Dates are ISO 8601 UTC. Money is integer minor units plus currency. Externally visible IDs are opaque UUIDs.

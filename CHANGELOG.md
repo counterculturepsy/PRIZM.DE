@@ -27,3 +27,4 @@ All notable changes follow Keep a Changelog. The project has not released a stab
 - Transactional CRM activity/audit writes, normalized contact deduplication, idempotent lead creation, and cross-tenant regression coverage
 - M6 disabled-by-default workspace AI policies, idempotent daily-budget reservations, redacted audit-evidence snapshots, structured provider provenance, and review-only draft lifecycle
 - Evidence-grounded strategy/outreach pages, strict structured-output adapter, safe failure handling, human review screens, and tenant/role/quota regression coverage
+- M7 tenant-owned proposal records, append-only version snapshots, server-authoritative pricing, Owner/Admin approval, accessible print rendering, and tenant/role/version regression coverage

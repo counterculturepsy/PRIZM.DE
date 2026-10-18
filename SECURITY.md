@@ -20,6 +20,7 @@
 - Deterministic opportunity rules, relational evidence provenance, nullable catalogue-backed pricing, and composite tenant constraints
 - Tenant-scoped CRM references, attributed contact entry, normalized suppression records, transactional activity/audit writes, and read-only Viewer enforcement
 - Disabled-by-default AI at server and workspace levels, redacted bounded evidence snapshots, strict structured output, evidence-ID grounding, quota reservation, sanitized failures, and mandatory audited human review with no send path
+- Tenant-scoped append-only proposal versions, bounded integer money calculations, server-authoritative currency/totals, conditional Owner/Admin approval, and no public share, send, signature or payment path
 
 ## Required before production
 

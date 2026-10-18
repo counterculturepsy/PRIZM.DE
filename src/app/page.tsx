@@ -24,7 +24,7 @@ export default function HomePage() {
       <section className="relative mx-auto max-w-7xl px-6 pb-24 pt-20 lg:px-8 lg:pb-32 lg:pt-28">
         <div aria-hidden="true" className="absolute left-1/2 top-0 -z-10 h-[520px] w-[760px] -translate-x-1/2 rounded-full bg-primary/15 blur-[120px]" />
         <div className="max-w-4xl">
-          <p className="mb-6 inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-xs uppercase tracking-[0.18em] text-primary">M6 review-only sales assistant · South Africa first</p>
+          <p className="mb-6 inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-xs uppercase tracking-[0.18em] text-primary">M7 versioned proposals · South Africa first</p>
           <h1 className="text-balance text-5xl font-semibold leading-[1.02] tracking-[-0.045em] sm:text-6xl lg:text-8xl">Find your next client <span className="bg-gradient-to-r from-primary via-magenta to-cyan bg-clip-text text-transparent">before your competition does.</span></h1>
           <p className="mt-8 max-w-2xl text-pretty text-lg leading-8 text-muted-foreground sm:text-xl">PRIZM.DEV is being built to discover businesses with real digital opportunities, explain the evidence, and help teams turn qualified prospects into clients.</p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -50,7 +50,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t border-border px-6 py-8 text-center text-sm text-muted-foreground">PRIZM.DEV M6. Controlled discovery, audit queues, deterministic opportunity scoring, tenant-safe CRM, and evidence-grounded review-only drafts are implemented; AI generation, production audit processing, and outbound automation remain disabled by default.</footer>
+      <footer className="border-t border-border px-6 py-8 text-center text-sm text-muted-foreground">PRIZM.DEV M7. Controlled discovery, audits, opportunity scoring, tenant-safe CRM, review-only AI drafts, and versioned proposal snapshots are implemented; AI generation, production auditing, public proposal delivery, and outbound automation remain disabled by default.</footer>
     </main>
   );
 }

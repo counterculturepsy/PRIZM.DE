@@ -44,9 +44,11 @@ Strategies and outreach are schema-validated, evidence-grounded drafts with prov
 
 Acceptance evidence: append-only migration `0006`, redaction/grounding/provider unit tests, PGlite quota/idempotency/tenant/role/review coverage, authenticated strategy/outreach/review/policy routes, and fail-closed environment validation. Approved model selection, lawful-use and data-processing review, authorized staging evaluation, managed PostgreSQL/OAuth validation, monitoring, and production governance remain external gates.
 
-## M7 — Proposals
+## M7 — Proposals — implemented, commercial/legal validation pending
 
-Versioned proposals snapshot scope/pricing, require human approval, and export accessibly without representing estimates as guarantees.
+Versioned proposals snapshot scope and server-calculated pricing, require Owner/Admin approval, preserve append-only revision history, and render as accessible print-ready HTML without representing estimates as guarantees. M7 has no send, signature, public-share, invoice or payment operation.
+
+Acceptance evidence: append-only migration `0007`, bounded pricing validation, PGlite idempotency/tenant/role/version/approval coverage, authenticated proposal workspace/detail/print routes, and immutable historical snapshots. Legal terms, tax treatment, quote-validity policy, real customer review, branded PDF rendering, public sharing, e-signature and delivery remain external gates.
 
 ## M8 — Campaigns
 

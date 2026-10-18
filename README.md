@@ -2,7 +2,7 @@
 
 PRIZM.DEV is a workspace-safe client-acquisition operating system for developers and digital agencies. Its product principle is simple: **do not give users more leads; give them better opportunities.**
 
-This repository contains M0 architecture through the M6 review-only AI sales-assistant foundation. Database-backed identity, isolated workspaces, onboarding, roles, bounded company imports, provenance, durable audit jobs, bounded static analysis, evidence reports, deterministic opportunity rules, explainable lead scores, tenant-safe CRM, and evidence-grounded strategy/outreach drafts with mandatory review are implemented. The audit worker and AI provider are disabled by default; external discovery, live AI use, outbound outreach, calendar integrations, and proposals remain gated capabilities.
+This repository contains M0 architecture through the M7 versioned-proposal foundation. Database-backed identity, isolated workspaces, onboarding, roles, bounded company imports, provenance, durable audit jobs, bounded static analysis, evidence reports, deterministic opportunity rules, explainable lead scores, tenant-safe CRM, evidence-grounded strategy/outreach drafts, and immutable human-approved proposal snapshots are implemented. The audit worker and AI provider are disabled by default; external discovery, live AI use, outbound outreach, public proposal delivery, signatures, payments, and calendar integrations remain gated capabilities.
 
 ## Stack
 
@@ -27,7 +27,7 @@ Do not enable `WEBSITE_AUDIT_ENABLED` for ordinary local UI work. Approved opera
 
 Do not enable `AI_GENERATION_ENABLED` or add a live provider key merely for local validation. M6 tests use mocked transport. External generation additionally requires an explicit compatible model, an enabled workspace policy, data-processing and lawful-use approval, authorized staging evaluation, monitoring, and production governance.
 
-OAuth sign-in is exposed only when a complete provider pair is configured. The protected application shell lives at `/app`; a first-time user creates a workspace and completes onboarding before importing an approved company CSV at `/app/discover/search`. Materialized M4 recommendations are available at `/app/discover/opportunities`; they can become M5 leads without initiating outreach. CRM work is available under `/app/leads` and `/app/crm/*`. M6 review-only drafts live under `/app/ai/*`, with policy management at `/app/settings/ai`; no route sends messages.
+OAuth sign-in is exposed only when a complete provider pair is configured. The protected application shell lives at `/app`; a first-time user creates a workspace and completes onboarding before importing an approved company CSV at `/app/discover/search`. Materialized M4 recommendations are available at `/app/discover/opportunities`; they can become M5 leads without initiating outreach. CRM work is available under `/app/leads` and `/app/crm/*`. M6 review-only drafts live under `/app/ai/*`, and M7 proposal versions live under `/app/proposals`; neither area sends messages.
 
 ## Quality gates
 

@@ -50,6 +50,13 @@
       "when": 1792247352553,
       "tag": "0006_left_meggan",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792354176720,
+      "tag": "0007_giant_thena",
+      "breakpoints": true
     }
   ]
 }

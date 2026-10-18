@@ -25,3 +25,5 @@ All notable changes follow Keep a Changelog. The project has not released a stab
 - M5 tenant-owned leads, deals, attributed contacts, notes, follow-up tasks, append-only activity, and suppression records
 - Role-aware lead workspace, responsive pipeline, contact directory, task list, and activity timeline routes
 - Transactional CRM activity/audit writes, normalized contact deduplication, idempotent lead creation, and cross-tenant regression coverage
+- M6 disabled-by-default workspace AI policies, idempotent daily-budget reservations, redacted audit-evidence snapshots, structured provider provenance, and review-only draft lifecycle
+- Evidence-grounded strategy/outreach pages, strict structured-output adapter, safe failure handling, human review screens, and tenant/role/quota regression coverage

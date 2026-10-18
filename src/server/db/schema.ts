@@ -1,4 +1,5 @@
 import { sql } from "drizzle-orm";
+import type { SalesDraft, SalesEvidence } from "@/modules/ai/sales";
 import {
   boolean,
   check,
@@ -785,6 +786,49 @@ export const savedSearches = pgTable(
   ],
 );
 
+export const aiWorkspacePolicies = pgTable("ai_workspace_policies", {
+  workspaceId: uuid("workspace_id").primaryKey().references(() => workspaces.id, { onDelete: "cascade" }),
+  enabled: boolean("enabled").default(false).notNull(),
+  dailyRequestLimit: integer("daily_request_limit").default(10).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [check("ai_policy_limit_check", sql`${table.dailyRequestLimit} between 1 and 100`)]);
+
+export const aiDraftStatus = pgEnum("ai_draft_status", ["running", "completed", "failed"]);
+export const aiReviewStatus = pgEnum("ai_review_status", ["pending", "approved", "rejected"]);
+export const aiDraftPurpose = pgEnum("ai_draft_purpose", ["strategy", "outreach"]);
+export const aiDraftRuns = pgTable("ai_draft_runs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  leadId: uuid("lead_id").notNull(),
+  actorUserId: uuid("actor_user_id").notNull(),
+  requestKey: uuid("request_key").notNull(),
+  purpose: aiDraftPurpose("purpose").notNull(),
+  status: aiDraftStatus("status").default("running").notNull(),
+  reviewStatus: aiReviewStatus("review_status").default("pending").notNull(),
+  provider: text("provider").notNull(),
+  model: text("model").notNull(),
+  promptVersion: text("prompt_version").notNull(),
+  evidence: jsonb("evidence").$type<SalesEvidence[]>().notNull(),
+  output: jsonb("output").$type<SalesDraft>(),
+  errorCode: text("error_code"),
+  inputTokens: integer("input_tokens"),
+  outputTokens: integer("output_tokens"),
+  durationMs: integer("duration_ms"),
+  reviewerUserId: uuid("reviewer_user_id"),
+  reviewNote: text("review_note"),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+}, (table) => [
+  uniqueIndex("ai_runs_workspace_request_unique").on(table.workspaceId, table.requestKey),
+  index("ai_runs_workspace_created_idx").on(table.workspaceId, table.createdAt),
+  index("ai_runs_workspace_lead_idx").on(table.workspaceId, table.leadId),
+  foreignKey({ columns: [table.workspaceId, table.leadId], foreignColumns: [leads.workspaceId, leads.id], name: "ai_runs_workspace_lead_fk" }).onDelete("cascade"),
+  foreignKey({ columns: [table.workspaceId, table.actorUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "ai_runs_workspace_actor_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [table.workspaceId, table.reviewerUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "ai_runs_workspace_reviewer_fk" }).onDelete("restrict"),
+  check("ai_runs_review_check", sql`(${table.reviewStatus} = 'pending' and ${table.reviewedAt} is null and ${table.reviewerUserId} is null) or (${table.status} = 'completed' and ${table.reviewedAt} is not null and ${table.reviewerUserId} is not null)`),
+]);
+
 export const schema = {
   users,
   accounts,
@@ -816,4 +860,6 @@ export const schema = {
   crmTasks,
   crmActivities,
   suppressionEntries,
+  aiWorkspacePolicies,
+  aiDraftRuns,
 };

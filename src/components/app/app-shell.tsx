@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, Building2, KanbanSquare, LayoutDashboard, Lightbulb, ListChecks, ScanSearch, Search, Settings, Users } from "lucide-react";
+import { BarChart3, Bot, Building2, KanbanSquare, LayoutDashboard, Lightbulb, ListChecks, MessageSquareText, ScanSearch, Search, Settings, Users } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
 import { selectWorkspaceAction } from "@/app/app/actions";
 import type { WorkspaceSummary } from "@/server/workspaces/context";
@@ -13,6 +13,8 @@ const activeLinks = [
   { href: "/app/leads", label: "CRM leads", icon: Users },
   { href: "/app/crm/pipeline", label: "Pipeline", icon: KanbanSquare },
   { href: "/app/crm/tasks", label: "Tasks", icon: ListChecks },
+  { href: "/app/ai/strategy", label: "AI strategy", icon: Bot },
+  { href: "/app/ai/outreach", label: "Outreach drafts", icon: MessageSquareText },
   { href: "/app/settings/profile", label: "Settings", icon: Settings },
 ] as const;
 
@@ -61,7 +63,7 @@ export function AppShell({ children, memberships, activeId, userName }: { childr
         <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-3 border-b border-border bg-background/90 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div className="lg:hidden"><Logo className="text-sm" /></div>
           <div className="hidden lg:block"><WorkspaceSelect activeId={activeId} memberships={memberships} /></div>
-          <div className="flex items-center gap-3 text-right"><div><p className="text-sm font-medium">{userName}</p><p className="text-xs text-muted-foreground">M5 CRM</p></div><Link className="text-xs text-muted-foreground hover:text-foreground" href="/api/auth/signout">Sign out</Link></div>
+          <div className="flex items-center gap-3 text-right"><div><p className="text-sm font-medium">{userName}</p><p className="text-xs text-muted-foreground">M6 review-only AI</p></div><Link className="text-xs text-muted-foreground hover:text-foreground" href="/api/auth/signout">Sign out</Link></div>
         </header>
         <details className="border-b border-border p-4 lg:hidden">
           <summary className="cursor-pointer text-sm font-medium">Navigation and workspace</summary>

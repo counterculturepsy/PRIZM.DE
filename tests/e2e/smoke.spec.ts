@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("landing page is reachable and honest about the current milestone", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Find your next client");
-  await expect(page.getByText(/controlled discovery, audit queues, deterministic opportunity scoring, and tenant-safe CRM workflows are implemented; external providers, production audit processing, and outbound automation remain disabled by default/i)).toBeVisible();
+  await expect(page.getByText(/controlled discovery, audit queues, deterministic opportunity scoring, tenant-safe CRM, and evidence-grounded review-only drafts are implemented; AI generation, production audit processing, and outbound automation remain disabled by default/i)).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -27,4 +27,11 @@ test("opportunity feed remains protected", async ({ page }) => {
 test("CRM routes remain protected", async ({ page }) => {
   await page.goto("/app/crm/pipeline");
   await expect(page).toHaveURL(/\/login$/);
+});
+
+test("AI draft and policy routes remain protected", async ({ page }) => {
+  for (const route of ["/app/ai/strategy", "/app/ai/outreach", "/app/settings/ai"]) {
+    await page.goto(route);
+    await expect(page).toHaveURL(/\/login$/);
+  }
 });

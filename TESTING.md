@@ -10,7 +10,7 @@
 
 ## Commands
 
-M8 unit tests cover sequence order/delay/cap rules and header injection. PGlite tests apply migration `0008` and prove campaign idempotency, cross-tenant constraints, role denial, duplicate email enrollment, later suppression/address changes, review reset and enrollment removal preserving suppression. Protected campaign routes are tested on desktop and mobile. Live provider and authenticated staging journeys remain separate gates.
+M8 unit tests cover sequence order/delay/cap rules, header injection, the disabled provider and token hashing. PGlite tests apply migrations `0008`–`0009` and prove campaign idempotency, cross-tenant constraints, role denial, duplicate enrollment, later suppression/address changes, immutable staging, leased daily caps, provider-event replay protection and atomic unsubscribe suppression. Protected campaign routes and public unsubscribe screens are tested on desktop and mobile. No test invokes a live provider; authenticated staging delivery remains an external gate.
 
 `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, and `pnpm test:e2e` are required gates. Playwright needs Chromium (`pnpm exec playwright install chromium`). PGlite applies the real generated migrations without requiring a system PostgreSQL installation; live OAuth/database E2E remains a deployment-environment gate.
 

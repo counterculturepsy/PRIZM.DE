@@ -38,3 +38,26 @@ Owner/Admin/Sales may prepare campaigns; Owner/Admin alone review. Developer/Vie
 ## Remaining M8 delivery work
 
 Provider adapter/approval, encrypted credentials, verified sender, double-checked contact-use policy, unsubscribe and suppression ingestion, signed/replay-safe bounce webhooks, idempotent delivery/reconciliation, scheduling, worker leases, sending caps, retry policy, monitoring and external staging tests must all pass before sending can be enabled.
+
+## Delivery control-plane slice
+
+This next slice adds provider-independent safety infrastructure while keeping all outbound delivery disabled:
+
+- Immutable message snapshots bind a reviewed campaign, step and enrollment to a normalized address, subject, body, schedule and provider idempotency key.
+- PostgreSQL queue leases use `FOR UPDATE SKIP LOCKED`, bounded attempts and stale-lease recovery. Daily campaign caps are enforced when work is claimed, not only when an audience is prepared.
+- The worker rechecks campaign review, current contact address, contact-level do-not-contact and workspace suppression immediately before invoking a provider port.
+- The only built-in provider is a disabled adapter. `CAMPAIGN_DELIVERY_ENABLED` defaults to false and cannot create a working transport without a separately reviewed adapter and verified sender configuration.
+- Public unsubscribe tokens are high-entropy, stored only as SHA-256 hashes, expire, are single-use and add an idempotent workspace-wide email suppression without storing the raw token.
+- Provider event ingestion accepts only signature-verified normalized events from a provider adapter. External event IDs are unique per provider, raw payloads are not persisted, and bounce/complaint/unsubscribe outcomes create suppression.
+- Delivery metadata stores bounded error codes and provider identifiers, never credentials, raw webhook payloads or authorization headers.
+
+### Delivery control-plane acceptance
+
+1. Migration is append-only and tenant-composite foreign keys reject cross-workspace campaigns, steps, recipients, messages and tokens.
+2. Materialization is Owner/Admin-only, requires a currently reviewed and ready campaign, and is idempotent for each campaign/step/recipient.
+3. A suppressed, changed or do-not-contact recipient cannot reach the provider port even if suppression occurs after materialization.
+4. Worker claims are lease-safe, bounded by attempts and campaign daily cap, and reuse a stable provider idempotency key.
+5. Delivery disabled state fails before claiming or sending; the built-in disabled adapter can never deliver.
+6. Unsubscribe tokens are not stored in plaintext, cannot be replayed, and create idempotent workspace-wide suppression.
+7. Unsigned events are rejected, duplicate external events are no-ops, and complaint/bounce/unsubscribe transitions are reconciled without storing raw bodies.
+8. Unit/integration, lint, strict typecheck, production build and public/protected route smoke tests pass. Live provider staging remains an external blocker.

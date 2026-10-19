@@ -71,6 +71,8 @@ Client-supplied workspace IDs are selectors, never proof of access. Future Postg
 | `/app/campaigns/[campaignId]` | Member; Sales/Admin prepare; Admin/Owner review | M8 preparation | Sequence, audience, current readiness and human review; delivery disabled |
 | `/app/campaigns/sequences` | Member; Sales/Admin prepare | M8 preparation | Sequences and steps |
 | `/app/campaigns/templates` | Member | M8 | Message templates |
+| `/unsubscribe/[token]` | Public, unguessable token | M8 control plane | Confirmation page for workspace-wide email suppression |
+| `/unsubscribe/complete` | Public | M8 control plane | Non-sensitive unsubscribe result |
 | `/app/reports/sales` | Member | M9 | Sales analytics |
 | `/app/reports/leads` | Member | M9 | Lead analytics |
 | `/app/reports/revenue` | Admin/Owner | M9 | Revenue reporting |

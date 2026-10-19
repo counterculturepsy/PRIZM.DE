@@ -21,6 +21,7 @@ async function authorize(tx: Transaction, scope: WorkspaceScope, review = false)
 async function requireCampaign(tx: Transaction, scope: WorkspaceScope, id: string) {
   const [campaign] = await tx.select().from(campaigns).where(and(eq(campaigns.workspaceId, scope.workspaceId), eq(campaigns.id, id))).limit(1);
   if (!campaign) throw new CampaignError("Choose a campaign in the active workspace.");
+  if (campaign.stagedAt) throw new CampaignError("This campaign has immutable staged messages and can no longer be edited.");
   return campaign;
 }
 
@@ -89,7 +90,7 @@ export async function enrollCampaignRecipient(scope: WorkspaceScope, input: unkn
   });
 }
 
-async function details(db: Database | Transaction, scope: WorkspaceScope, id: string) {
+export async function campaignDetails(db: Database | Transaction, scope: WorkspaceScope, id: string) {
   const [campaign] = await db.select().from(campaigns).where(and(eq(campaigns.workspaceId, scope.workspaceId), eq(campaigns.id, id))).limit(1);
   if (!campaign) return null;
   const steps = await db.select({ id: campaignSteps.id, position: campaignSteps.position, delayDays: campaignSteps.delayDays, subject: campaignTemplates.subject, body: campaignTemplates.body, templateName: campaignTemplates.name }).from(campaignSteps)
@@ -109,7 +110,7 @@ export async function reviewCampaign(scope: WorkspaceScope, input: unknown) {
   const parsed = campaignReviewSchema.parse(input);
   await getDatabase().transaction(async (tx) => {
     await authorize(tx, scope, true);
-    const result = await details(tx, scope, parsed.campaignId);
+    const result = await campaignDetails(tx, scope, parsed.campaignId);
     if (!result) throw new CampaignError("Choose a campaign in the active workspace.");
     if (result.issues.length) throw new CampaignError(result.issues.join(" "));
     const [updated] = await tx.update(campaigns).set({ status: "reviewed", reviewedByUserId: scope.userId, reviewNote: parsed.note, reviewedAt: new Date(), updatedAt: new Date() }).where(and(eq(campaigns.workspaceId, scope.workspaceId), eq(campaigns.id, parsed.campaignId), eq(campaigns.status, "draft"))).returning({ id: campaigns.id });
@@ -140,4 +141,4 @@ export async function removeCampaignStep(scope: WorkspaceScope, input: unknown) 
 
 export function listCampaigns(scope: WorkspaceScope) { return getDatabase().select().from(campaigns).where(eq(campaigns.workspaceId, scope.workspaceId)).orderBy(desc(campaigns.updatedAt)).limit(100); }
 export function listCampaignTemplates(scope: WorkspaceScope) { return getDatabase().select().from(campaignTemplates).where(eq(campaignTemplates.workspaceId, scope.workspaceId)).orderBy(desc(campaignTemplates.createdAt)).limit(100); }
-export function getCampaign(scope: WorkspaceScope, id: string) { return details(getDatabase(), scope, id); }
+export function getCampaign(scope: WorkspaceScope, id: string) { return campaignDetails(getDatabase(), scope, id); }

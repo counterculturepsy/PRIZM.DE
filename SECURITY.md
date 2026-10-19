@@ -21,6 +21,7 @@
 - Tenant-scoped CRM references, attributed contact entry, normalized suppression records, transactional activity/audit writes, and read-only Viewer enforcement
 - Disabled-by-default AI at server and workspace levels, redacted bounded evidence snapshots, strict structured output, evidence-ID grounding, quota reservation, sanitized failures, and mandatory audited human review with no send path
 - Tenant-scoped append-only proposal versions, bounded integer money calculations, server-authoritative currency/totals, conditional Owner/Admin approval, and no public share, send, signature or payment path
+- Immutable campaign message snapshots, stable provider idempotency keys, leased claims, atomic daily reservations, pre-send suppression rechecks, one-way unsubscribe-token hashes, replay-safe normalized events, and fail-closed delivery configuration
 
 ## Required before production
 
@@ -32,7 +33,7 @@ Authentication is not authorization. The server resolves active membership for e
 
 ## Outreach and data use
 
-M8 campaign preparation has no message transport. Only Owner/Admin/Sales may prepare; Owner/Admin alone review. Service mutations revalidate active role/membership. Enrollment checks contact flags and workspace-wide normalized email suppression, and readiness checks them again, including address changes. A historical review cannot authorize future delivery. Plain-text templates render without HTML execution or interpolation. Contact-use basis remains a human-supplied record requiring independent policy review. Approved provider/sender, encrypted credentials, signed/replay-safe unsubscribe/bounce processing, idempotent delivery, enforced runtime caps and monitoring must precede any send implementation.
+Only Owner/Admin/Sales may prepare campaigns; Owner/Admin alone review and stage immutable delivery records. Service mutations revalidate active role/membership. Enrollment checks contact flags and workspace-wide normalized email suppression; review and the worker recheck suppression and address changes. Plain-text templates render without HTML execution or interpolation. Public unsubscribe tokens are never stored raw, expire, are atomically single-use and expose no address. Provider events must be signature-verified by a future adapter before normalized ingestion; raw payloads are not retained. The runtime rejects enabled delivery and ships no live provider. Approved provider/sender, encrypted credentials, provider-specific signature verification, monitoring, staging validation and independent policy review remain mandatory before any send.
 
 Only compliant/public APIs, user imports, and permissibly public data sources may be used. No uncontrolled scraping. Store source attribution, honour suppression/opt-out state, deduplicate, rate-limit, and require human review. POPIA/GDPR readiness is a design requirement, not a legal-compliance claim.
 

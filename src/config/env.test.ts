@@ -27,4 +27,9 @@ describe("serverEnvSchema", () => {
     expect(serverEnvSchema.safeParse({ ...valid, WEBSITE_AUDIT_ENABLED: "yes" }).success).toBe(false);
     expect(serverEnvSchema.parse({ ...valid, WEBSITE_AUDIT_ENABLED: "false" }).WEBSITE_AUDIT_ENABLED).toBe(false);
   });
+
+  it("keeps campaign delivery fail-closed in this release", () => {
+    expect(serverEnvSchema.parse({ ...valid, CAMPAIGN_DELIVERY_ENABLED: "false" }).CAMPAIGN_DELIVERY_ENABLED).toBe(false);
+    expect(serverEnvSchema.safeParse({ ...valid, CAMPAIGN_DELIVERY_ENABLED: "true" }).success).toBe(false);
+  });
 });

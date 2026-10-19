@@ -35,12 +35,16 @@ export const serverEnvSchema = z
     ANTHROPIC_API_KEY: optionalSecret,
     GOOGLE_GENERATIVE_AI_API_KEY: optionalSecret,
     WEBSITE_AUDIT_ENABLED: optionalBoolean.default(false),
+    CAMPAIGN_DELIVERY_ENABLED: optionalBoolean.default(false),
     AUDIT_USER_AGENT: z.preprocess((value) => value === "" ? undefined : value, z.string().min(10).max(300).optional()).default("PRIZMDEV/1.0"),
     AUDIT_MAX_RESPONSE_BYTES: z.preprocess((value) => value === "" || value === undefined ? undefined : Number(value), z.number().int().min(100_000).max(2_000_000).optional()).default(2_000_000),
   })
   .superRefine((value, context) => {
     if (value.AI_GENERATION_ENABLED && (!value.OPENAI_API_KEY || !value.OPENAI_MODEL)) {
       context.addIssue({ code: "custom", path: ["AI_GENERATION_ENABLED"], message: "Enabled AI requires an OpenAI key and explicit model." });
+    }
+    if (value.CAMPAIGN_DELIVERY_ENABLED) {
+      context.addIssue({ code: "custom", path: ["CAMPAIGN_DELIVERY_ENABLED"], message: "Campaign delivery has no approved provider adapter in this release." });
     }
     const pairs = [
       ["AUTH_GITHUB_ID", "AUTH_GITHUB_SECRET"],

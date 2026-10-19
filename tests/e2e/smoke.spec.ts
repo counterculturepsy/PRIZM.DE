@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("landing page is reachable and honest about the current milestone", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Find your next client");
-  await expect(page.getByText(/controlled discovery, audits, opportunity scoring, tenant-safe CRM, review-only AI drafts, and versioned proposal snapshots are implemented; AI generation, production auditing, public proposal delivery, and outbound automation remain disabled by default/i)).toBeVisible();
+  await expect(page.getByText(/campaign preparation, unsubscribe suppression, and a fail-closed delivery control plane are implemented; live providers and outbound automation remain disabled/i)).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -46,4 +46,13 @@ test("campaign preparation routes remain protected", async ({ page }) => {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login$/);
   }
+});
+
+test("unsubscribe confirmation and result screens are public and non-sensitive", async ({ page }) => {
+  const token = `00000000-0000-4000-8000-000000000001.${"a".repeat(43)}`;
+  await page.goto(`/unsubscribe/${token}`);
+  await expect(page.getByRole("heading", { name: "Stop campaign email" })).toBeVisible();
+  await expect(page.getByText(/does not expose your address/i)).toBeVisible();
+  await page.goto("/unsubscribe/complete");
+  await expect(page.getByRole("heading", { name: "Unsubscribed" })).toBeVisible();
 });

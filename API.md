@@ -53,7 +53,11 @@ Application routes use server components/actions for first-party UI and `/api/v1
 - Campaign creation is idempotent per workspace/request key; conflicting reuse is rejected. Enrollment deduplicates contact and email per campaign. Preparation has a maximum audience of 100 and configurable daily cap of 1–100.
 - Workspace email suppression and do-not-contact flags block enrollment. Readiness/review rechecks both suppression and changed contact email snapshots. Removing enrollment preserves contact/suppression records.
 - Only Owner/Admin may record preparation review with a note, after current readiness passes. Audience/sequence changes clear review. Every mutation is audited without contact values in audit metadata.
-- No sending endpoint, scheduler, unsubscribe endpoint or provider webhook is exposed in this foundation. Delivery readiness always reports missing provider, unsubscribe/bounce and operational controls.
+- Owner/Admin-only staging materializes immutable step/recipient message snapshots and freezes the campaign. It is a server service boundary, not a public launch endpoint.
+- The delivery service uses leased claims, stable provider idempotency keys, bounded retry metadata and atomic UTC daily reservations. It rechecks review state, the current address, do-not-contact and workspace suppression immediately before calling an injected provider port.
+- `GET /unsubscribe/[token]` is a non-mutating confirmation page. Its server action consumes a one-way-hashed, expiring, single-use token and creates idempotent workspace-wide suppression; responses do not reveal the address.
+- Provider event ingestion is server-only and accepts only already signature-verified normalized events. Unique provider/event IDs prevent replay; only a SHA-256 payload digest and bounded identifiers are stored, never a raw webhook body.
+- No live provider adapter, callback route, campaign-launch action or deployable delivery worker is exposed. `CAMPAIGN_DELIVERY_ENABLED=true` fails environment validation in this release.
 
 Future JSON responses use `{ data, meta }`; errors use `{ error: { code, message, requestId, fieldErrors? } }`. Never return stack traces, SQL details, secrets, provider payloads, or record existence across a tenant boundary.
 

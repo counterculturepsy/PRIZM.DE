@@ -32,10 +32,13 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 - `ai_draft_runs`: tenant-owned quota reservations, immutable redacted evidence snapshots, structured output, provider provenance, usage, safe failure state, and conditional human review
 - `proposals`: tenant/lead-owned proposal identity, current version, lifecycle, creator and conditional approval metadata
 - `proposal_versions`: append-only client-visible scope, deliverables, terms guidance, line items and server-authoritative pricing snapshots
+- `campaign_templates`, `campaigns`, `campaign_steps`, `campaign_recipients`: immutable content, reviewed preparation, ordered sequence and attributed audience snapshots
+- `campaign_messages`, `campaign_delivery_usage`: immutable staged messages, leased retry state, provider idempotency and serialized UTC daily reservations
+- `campaign_unsubscribe_tokens`, `campaign_provider_events`: one-way token hashes and replay-safe normalized delivery outcomes without raw provider payloads
 
 ## Planned domain schema
 
-M8 preparation adds `campaign_templates` (immutable plain text), `campaigns` (draft/reviewed state and cap), `campaign_steps` (unique ordered positions, cumulative delays) and `campaign_recipients` (same-tenant contact plus email snapshot and contact-use basis). Composite keys reject foreign-tenant references. Audience addresses are unique per campaign; changes reset review. Sending/message tables and provider secrets are not part of this migration.
+Later milestones add analytics, billing, integration credential storage and production operations. Provider secrets are not part of the campaign schema.
 
 | Domain | Tables | Ownership and key constraints |
 | --- | --- | --- |
@@ -47,7 +50,7 @@ M8 preparation adds `campaign_templates` (immutable plain text), `campaigns` (dr
 | CRM | `leads`, `deals`, `crm_activities`, `crm_tasks`, `crm_notes` | implemented in M5; composite tenant references, one lead/deal per company, append-only history; meetings deferred |
 | AI drafts | `ai_workspace_policies`, `ai_draft_runs` | implemented in M6; workspace/lead/member composite references, request-key idempotency, bounded evidence snapshots, provider provenance, and review-only lifecycle |
 | Proposals | `proposals`, `proposal_versions` | implemented in M7; workspace/lead/member composite references, idempotent creation, serialized append-only versions, server-calculated totals, and privileged approval |
-| Outreach | `campaigns`, `sequences`, `sequence_steps`, `email_templates`, `messages` | workspace; suppression and human-review checks before send |
+| Outreach | `campaign_templates`, `campaigns`, `campaign_steps`, `campaign_recipients`, `campaign_messages`, `campaign_delivery_usage`, `campaign_unsubscribe_tokens`, `campaign_provider_events` | implemented M8 control plane; tenant-composite references, review/staging freeze, suppression recheck, leased/capped claims, token/event replay protection; live provider absent |
 | Proposals | `proposals`, `proposal_items` | workspace; pricing snapshots use integer minor units |
 | Platform | `integrations`, `notifications`, `subscriptions`, `usage_records`, `audit_logs` | workspace; integration tokens encrypted and never selected by default |
 

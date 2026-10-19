@@ -50,11 +50,11 @@ Versioned proposals snapshot scope and server-calculated pricing, require Owner/
 
 Acceptance evidence: append-only migration `0007`, bounded pricing validation, PGlite idempotency/tenant/role/version/approval coverage, authenticated proposal workspace/detail/print routes, and immutable historical snapshots. Legal terms, tax treatment, quote-validity policy, real customer review, branded PDF rendering, public sharing, e-signature and delivery remain external gates.
 
-## M8 — Campaigns — preparation foundation implemented; delivery pending
+## M8 — Campaigns — safety control plane implemented; live integration pending
 
 Integrations, templates, sequences, suppression, unsubscribe, bounce handling, sending caps, deduplication, and auditability are operational before any bulk send.
 
-Preparation supports immutable plain-text templates, ordered sequence steps, daily audience caps, idempotent campaigns, recipient deduplication, documented contact-use basis and privileged human review. Suppression and stale email snapshots are rechecked on reads and review; content/audience changes reset review. Migration `0008` and campaign validation/tenant/role/suppression integration tests cover this foundation. No message transport, scheduling worker, provider callback, or send operation exists. Full M8 acceptance still requires approved integration credentials and sender, unsubscribe/bounce/replay handling, delivery idempotency, runtime caps, monitoring and authorized staging validation. Preparation completion must not be reported as delivery completion.
+Preparation supports immutable plain-text templates, ordered sequence steps, daily audience caps, idempotent campaigns, recipient deduplication, documented contact-use basis and privileged human review. Suppression and stale email snapshots are rechecked on reads and review; content/audience changes reset review. Migration `0008` covers preparation. Migration `0009` adds immutable staged messages, stable provider idempotency keys, leased claims, UTC daily reservations, bounded retries, one-way hashed single-use unsubscribe tokens, normalized replay-safe provider events and system-created suppression. The runtime switch rejects enabled delivery and the only built-in adapter is disabled. Full M8 acceptance still requires an approved provider adapter and credentials, verified sender, provider-specific signature verification, operational worker scheduling/monitoring, authorized staging delivery and policy/legal approval. Control-plane completion must not be reported as live delivery completion.
 
 ## M9 — Analytics
 

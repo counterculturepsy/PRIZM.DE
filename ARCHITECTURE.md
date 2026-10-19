@@ -75,7 +75,7 @@ Client-supplied workspace IDs are selectors, never proof of access. Future Postg
 | `/unsubscribe/complete` | Public | M8 control plane | Non-sensitive unsubscribe result |
 | `/app/reports/sales` | Member | M9 | Sales analytics |
 | `/app/reports/leads` | Member | M9 | Lead analytics |
-| `/app/reports/revenue` | Admin/Owner | M9 | Revenue reporting |
+| `/app/reports/revenue` | Admin/Owner | M9 | Deal-value reporting; explicitly not recognized revenue |
 | `/app/settings/profile` | Member | M1 | User profile |
 | `/app/settings/services` | Admin/Owner | M1 | Service catalogue |
 | `/app/settings/icp` | Admin/Owner | M1 | Ideal customer profile |
@@ -111,3 +111,4 @@ PRIZM.DEV uses a near-black technical canvas without gaming-style decoration. To
 - **Single-page static audits first:** the approved worker fetches one public HTML document, respects robots policy, pins validated public IPs, revalidates redirects, and never executes JavaScript or follows links.
 - **Deterministic M4 intelligence:** opportunity rules and lead scores are pure, versioned functions over tenant-owned observations and ICP configuration. M4 makes no AI call, invents no price, and never sends outreach.
 - **Transactional M5 CRM:** every mutation scopes all references by the trusted workspace and commits the business record, activity event, and audit metadata together. Contact provenance and suppression are explicit; M5 never sends outreach.
+- **Derived M9 analytics:** exact database aggregates operate over existing workspace-owned source, company, lead, deal and proposal records. The versioned contract captures one as-of instant, groups rather than converts currencies, and does not manufacture historical events or accounting revenue.

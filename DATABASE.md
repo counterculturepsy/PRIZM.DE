@@ -36,6 +36,10 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 - `campaign_messages`, `campaign_delivery_usage`: immutable staged messages, leased retry state, provider idempotency and serialized UTC daily reservations
 - `campaign_unsubscribe_tokens`, `campaign_provider_events`: one-way token hashes and replay-safe normalized delivery outcomes without raw provider payloads
 
+## Derived analytics
+
+M9 adds no tables or migration. `analytics-v1` performs exact, read-only PostgreSQL aggregates over `companies`, `company_sources`, `leads`, `deals`, and `proposals`, always filtered by trusted `workspace_id`. This preserves one source of truth and avoids premature duplicated counters. A future warehouse or materialized view requires its own reconciliation, freshness, tenant-isolation, retention, and migration design.
+
 ## Planned domain schema
 
 Later milestones add analytics, billing, integration credential storage and production operations. Provider secrets are not part of the campaign schema.
@@ -51,7 +55,6 @@ Later milestones add analytics, billing, integration credential storage and prod
 | AI drafts | `ai_workspace_policies`, `ai_draft_runs` | implemented in M6; workspace/lead/member composite references, request-key idempotency, bounded evidence snapshots, provider provenance, and review-only lifecycle |
 | Proposals | `proposals`, `proposal_versions` | implemented in M7; workspace/lead/member composite references, idempotent creation, serialized append-only versions, server-calculated totals, and privileged approval |
 | Outreach | `campaign_templates`, `campaigns`, `campaign_steps`, `campaign_recipients`, `campaign_messages`, `campaign_delivery_usage`, `campaign_unsubscribe_tokens`, `campaign_provider_events` | implemented M8 control plane; tenant-composite references, review/staging freeze, suppression recheck, leased/capped claims, token/event replay protection; live provider absent |
-| Proposals | `proposals`, `proposal_items` | workspace; pricing snapshots use integer minor units |
 | Platform | `integrations`, `notifications`, `subscriptions`, `usage_records`, `audit_logs` | workspace; integration tokens encrypted and never selected by default |
 
 ## Isolation rules

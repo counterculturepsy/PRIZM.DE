@@ -2,9 +2,9 @@
 
 ## Layers
 
-- Unit: authorization scopes, URL/robots policy, deterministic website analysis, opportunity generation, scoring/classification, CRM validation/normalization/lifecycle rules, provider registries
+- Unit: authorization scopes, URL/robots policy, deterministic website analysis, opportunity generation, scoring/classification, CRM validation/normalization/lifecycle rules, analytics formatting/ratio/role rules, provider registries
 - Component: accessibility and state of reusable UI
-- Integration: generated migrations, PostgreSQL constraints, invitation safety, CSV idempotency, durable audit queue lifecycle, opportunity materialization/idempotency, CRM transaction/idempotency/suppression behaviour, and tenant-scoped queries against ephemeral PGlite (PostgreSQL in WebAssembly)
+- Integration: generated migrations, PostgreSQL constraints, invitation safety, CSV idempotency, durable audit queue lifecycle, opportunity materialization/idempotency, CRM transaction/idempotency/suppression behaviour, exact analytics aggregates/currency grouping/cross-tenant isolation, and tenant-scoped queries against ephemeral PGlite (PostgreSQL in WebAssembly)
 - API: authentication, authorization, validation, error contracts, idempotency
 - E2E: landing, login, protected redirects including CRM, responsive smoke coverage, onboarding, discovery, and milestone user journeys
 
@@ -15,3 +15,5 @@ M8 unit tests cover sequence order/delay/cap rules, header injection, the disabl
 `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, and `pnpm test:e2e` are required gates. Playwright needs Chromium (`pnpm exec playwright install chromium`). PGlite applies the real generated migrations without requiring a system PostgreSQL installation; live OAuth/database E2E remains a deployment-environment gate.
 
 Tests must prove behaviour at boundaries, especially cross-workspace denial and role restrictions. A test that merely mirrors implementation is not sufficient.
+
+M9 tests use a fixed as-of instant and two workspaces. They verify rolling windows, distinct source attribution, top dimensions, stage counts, proposal coverage, won ratio, average closed cycle, currency-separated values, and that the second tenant cannot affect the first tenant's result. Browser smoke coverage verifies all report routes redirect unauthenticated users on desktop and mobile.

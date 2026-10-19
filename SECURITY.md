@@ -22,6 +22,7 @@
 - Disabled-by-default AI at server and workspace levels, redacted bounded evidence snapshots, strict structured output, evidence-ID grounding, quota reservation, sanitized failures, and mandatory audited human review with no send path
 - Tenant-scoped append-only proposal versions, bounded integer money calculations, server-authoritative currency/totals, conditional Owner/Admin approval, and no public share, send, signature or payment path
 - Immutable campaign message snapshots, stable provider idempotency keys, leased claims, atomic daily reservations, pre-send suppression rechecks, one-way unsubscribe-token hashes, replay-safe normalized events, and fail-closed delivery configuration
+- Tenant-filtered aggregate analytics, privileged deal-value access, versioned definitions, non-additive source caveats, currency separation, and no contact/message payload exposure
 
 ## Required before production
 
@@ -38,3 +39,7 @@ Only Owner/Admin/Sales may prepare campaigns; Owner/Admin alone review and stage
 Only compliant/public APIs, user imports, and permissibly public data sources may be used. No uncontrolled scraping. Store source attribution, honour suppression/opt-out state, deduplicate, rate-limit, and require human review. POPIA/GDPR readiness is a design requirement, not a legal-compliance claim.
 
 Report vulnerabilities privately to the repository owner; do not open a public issue containing exploit details or data.
+
+## Analytics privacy and authorization
+
+M9 reports resolve active membership server-side and every aggregate includes a workspace predicate. Sales/lead reports expose aggregate operational counts only. Deal-value reporting is Owner/Admin-only and is hidden from other roles. Reports do not include contact fields, message bodies, source snapshots, or raw provider payloads. Exact aggregate queries prevent misleading partial totals; explicit metric/version/timezone/currency labels prevent ambiguous interpretation. Future tracking, exports, cohort events, or a warehouse require separate privacy, retention, abuse, and tenant-isolation review.

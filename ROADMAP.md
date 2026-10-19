@@ -56,9 +56,11 @@ Integrations, templates, sequences, suppression, unsubscribe, bounce handling, s
 
 Preparation supports immutable plain-text templates, ordered sequence steps, daily audience caps, idempotent campaigns, recipient deduplication, documented contact-use basis and privileged human review. Suppression and stale email snapshots are rechecked on reads and review; content/audience changes reset review. Migration `0008` covers preparation. Migration `0009` adds immutable staged messages, stable provider idempotency keys, leased claims, UTC daily reservations, bounded retries, one-way hashed single-use unsubscribe tokens, normalized replay-safe provider events and system-created suppression. The runtime switch rejects enabled delivery and the only built-in adapter is disabled. Full M8 acceptance still requires an approved provider adapter and credentials, verified sender, provider-specific signature verification, operational worker scheduling/monitoring, authorized staging delivery and policy/legal approval. Control-plane completion must not be reported as live delivery completion.
 
-## M9 — Analytics
+## M9 — Analytics — foundation implemented; historical and revenue telemetry pending
 
-Workspace-scoped, reproducible metrics cover sources, funnel, revenue, and cycle time with timezone/currency definitions.
+Workspace-scoped, reproducible database aggregates cover rolling discovery, provider attribution, market composition, current pipeline stages, proposal coverage, won snapshot ratio, deal values by stored currency, and average closed-cycle time. Reports capture one as-of instant, show the workspace timezone, avoid cross-currency addition, and restrict won-value reporting to Owner/Admin. Current records cannot prove replies, meetings, historical stage transitions, invoices, collections, refunds, tax, or recognized revenue; those measures remain unavailable until explicit event history and the M10 billing/payment ledger exist.
+
+Acceptance evidence: the `analytics-v1` metric contract, authenticated `/app/reports/sales` and `/app/reports/leads`, privileged `/app/reports/revenue`, exact non-truncated aggregate queries, PGlite cross-tenant regression coverage, empty-state/caveat UI, and protected route smoke coverage. No migration is required because the foundation derives read-only metrics from existing authoritative tables.
 
 ## M10 — Billing
 

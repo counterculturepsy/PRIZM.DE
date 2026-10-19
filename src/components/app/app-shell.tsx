@@ -17,11 +17,8 @@ const activeLinks = [
   { href: "/app/ai/outreach", label: "Outreach drafts", icon: MessageSquareText },
   { href: "/app/proposals", label: "Proposals", icon: FileText },
   { href: "/app/campaigns", label: "Campaign preparation", icon: MessageSquareText },
+  { href: "/app/reports/sales", label: "Reports", icon: BarChart3 },
   { href: "/app/settings/profile", label: "Settings", icon: Settings },
-] as const;
-
-const plannedLinks = [
-  { label: "Reports", icon: BarChart3, milestone: "M9" },
 ] as const;
 
 function Navigation() {
@@ -31,12 +28,6 @@ function Navigation() {
         <Link className="flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" href={href} key={href}>
           <Icon aria-hidden="true" className="size-4" />{label}
         </Link>
-      ))}
-      <p className="mb-1 mt-6 px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Planned capabilities</p>
-      {plannedLinks.map(({ label, icon: Icon, milestone }) => (
-        <span className="flex min-h-10 items-center gap-3 px-3 text-sm text-muted-foreground/60" key={label}>
-          <Icon aria-hidden="true" className="size-4" />{label}<span className="ml-auto font-mono text-[10px]">{milestone}</span>
-        </span>
       ))}
     </nav>
   );
@@ -65,7 +56,7 @@ export function AppShell({ children, memberships, activeId, userName }: { childr
         <header className="sticky top-0 z-20 flex min-h-16 items-center justify-between gap-3 border-b border-border bg-background/90 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div className="lg:hidden"><Logo className="text-sm" /></div>
           <div className="hidden lg:block"><WorkspaceSelect activeId={activeId} memberships={memberships} /></div>
-          <div className="flex items-center gap-3 text-right"><div><p className="text-sm font-medium">{userName}</p><p className="text-xs text-muted-foreground">M7 proposals</p></div><Link className="text-xs text-muted-foreground hover:text-foreground" href="/api/auth/signout">Sign out</Link></div>
+          <div className="flex items-center gap-3 text-right"><div><p className="text-sm font-medium">{userName}</p><p className="text-xs text-muted-foreground">M9 analytics</p></div><Link className="text-xs text-muted-foreground hover:text-foreground" href="/api/auth/signout">Sign out</Link></div>
         </header>
         <details className="border-b border-border p-4 lg:hidden">
           <summary className="cursor-pointer text-sm font-medium">Navigation and workspace</summary>

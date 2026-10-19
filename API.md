@@ -59,6 +59,14 @@ Application routes use server components/actions for first-party UI and `/api/v1
 - Provider event ingestion is server-only and accepts only already signature-verified normalized events. Unique provider/event IDs prevent replay; only a SHA-256 payload digest and bounded identifiers are stored, never a raw webhook body.
 - No live provider adapter, callback route, campaign-launch action or deployable delivery worker is exposed. `CAMPAIGN_DELIVERY_ENABLED=true` fails environment validation in this release.
 
+## M9 analytics contracts
+
+- Reports are authenticated server-component reads. They accept no browser-supplied workspace identifier; trusted active membership provides the workspace scope.
+- `/app/reports/sales` and `/app/reports/leads` require active membership. `/app/reports/revenue` additionally requires Owner/Admin and returns a 404 to other roles.
+- All totals are exact database aggregates without list pagination or silent caps. Source provider counts use distinct companies and may overlap across providers.
+- Every snapshot has metric version `analytics-v1`, one server-captured as-of instant, workspace timezone metadata, and currency groups based on stored deal currency. Currencies are never combined or converted.
+- M9 exposes no public analytics endpoint, raw contact data, message content, tracking pixel, third-party telemetry, historical reply/meeting claim, or recognized-revenue claim.
+
 Future JSON responses use `{ data, meta }`; errors use `{ error: { code, message, requestId, fieldErrors? } }`. Never return stack traces, SQL details, secrets, provider payloads, or record existence across a tenant boundary.
 
 Mutations validate content type, body size, origin where appropriate, Zod schema, authenticated membership, capability, rate limit, and idempotency key where retries are possible. Pagination uses opaque cursors. Dates are ISO 8601 UTC. Money is integer minor units plus currency. Externally visible IDs are opaque UUIDs.

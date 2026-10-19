@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("landing page is reachable and honest about the current milestone", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Find your next client");
-  await expect(page.getByText(/campaign preparation, unsubscribe suppression, and a fail-closed delivery control plane are implemented; live providers and outbound automation remain disabled/i)).toBeVisible();
+  await expect(page.getByText(/campaign safety, and workspace-scoped reporting are implemented; live providers, outbound automation, and recognized-revenue reporting remain disabled/i)).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -43,6 +43,13 @@ test("proposal routes remain protected", async ({ page }) => {
 
 test("campaign preparation routes remain protected", async ({ page }) => {
   for (const path of ["/app/campaigns", "/app/campaigns/templates", "/app/campaigns/sequences", "/app/campaigns/00000000-0000-4000-8000-000000000001"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/login$/);
+  }
+});
+
+test("analytics routes remain protected", async ({ page }) => {
+  for (const path of ["/app/reports/sales", "/app/reports/leads", "/app/reports/revenue"]) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/login$/);
   }

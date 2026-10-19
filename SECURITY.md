@@ -32,6 +32,8 @@ Authentication is not authorization. The server resolves active membership for e
 
 ## Outreach and data use
 
+M8 campaign preparation has no message transport. Only Owner/Admin/Sales may prepare; Owner/Admin alone review. Service mutations revalidate active role/membership. Enrollment checks contact flags and workspace-wide normalized email suppression, and readiness checks them again, including address changes. A historical review cannot authorize future delivery. Plain-text templates render without HTML execution or interpolation. Contact-use basis remains a human-supplied record requiring independent policy review. Approved provider/sender, encrypted credentials, signed/replay-safe unsubscribe/bounce processing, idempotent delivery, enforced runtime caps and monitoring must precede any send implementation.
+
 Only compliant/public APIs, user imports, and permissibly public data sources may be used. No uncontrolled scraping. Store source attribution, honour suppression/opt-out state, deduplicate, rate-limit, and require human review. POPIA/GDPR readiness is a design requirement, not a legal-compliance claim.
 
 Report vulnerabilities privately to the repository owner; do not open a public issue containing exploit details or data.

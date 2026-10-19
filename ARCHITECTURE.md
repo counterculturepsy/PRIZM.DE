@@ -67,8 +67,9 @@ Client-supplied workspace IDs are selectors, never proof of access. Future Postg
 | `/app/crm/contacts` | Member | M5 | Attributed contacts |
 | `/app/crm/tasks` | Member | M5 | Tasks and follow-ups |
 | `/app/crm/activity` | Member | M5 | Activity timeline |
-| `/app/campaigns` | Sales/Admin | M8 | Controlled campaigns |
-| `/app/campaigns/sequences` | Sales/Admin | M8 | Sequences and steps |
+| `/app/campaigns` | Member; Sales/Admin prepare | M8 preparation | Campaign drafts; delivery disabled |
+| `/app/campaigns/[campaignId]` | Member; Sales/Admin prepare; Admin/Owner review | M8 preparation | Sequence, audience, current readiness and human review; delivery disabled |
+| `/app/campaigns/sequences` | Member; Sales/Admin prepare | M8 preparation | Sequences and steps |
 | `/app/campaigns/templates` | Member | M8 | Message templates |
 | `/app/reports/sales` | Member | M9 | Sales analytics |
 | `/app/reports/leads` | Member | M9 | Lead analytics |

@@ -40,3 +40,10 @@ test("proposal routes remain protected", async ({ page }) => {
   await page.goto("/app/proposals");
   await expect(page).toHaveURL(/\/login$/);
 });
+
+test("campaign preparation routes remain protected", async ({ page }) => {
+  for (const path of ["/app/campaigns", "/app/campaigns/templates", "/app/campaigns/sequences", "/app/campaigns/00000000-0000-4000-8000-000000000001"]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/login$/);
+  }
+});

@@ -50,9 +50,11 @@ Versioned proposals snapshot scope and server-calculated pricing, require Owner/
 
 Acceptance evidence: append-only migration `0007`, bounded pricing validation, PGlite idempotency/tenant/role/version/approval coverage, authenticated proposal workspace/detail/print routes, and immutable historical snapshots. Legal terms, tax treatment, quote-validity policy, real customer review, branded PDF rendering, public sharing, e-signature and delivery remain external gates.
 
-## M8 — Campaigns
+## M8 — Campaigns — preparation foundation implemented; delivery pending
 
 Integrations, templates, sequences, suppression, unsubscribe, bounce handling, sending caps, deduplication, and auditability are operational before any bulk send.
+
+Preparation supports immutable plain-text templates, ordered sequence steps, daily audience caps, idempotent campaigns, recipient deduplication, documented contact-use basis and privileged human review. Suppression and stale email snapshots are rechecked on reads and review; content/audience changes reset review. Migration `0008` and campaign validation/tenant/role/suppression integration tests cover this foundation. No message transport, scheduling worker, provider callback, or send operation exists. Full M8 acceptance still requires approved integration credentials and sender, unsubscribe/bounce/replay handling, delivery idempotency, runtime caps, monitoring and authorized staging validation. Preparation completion must not be reported as delivery completion.
 
 ## M9 — Analytics
 

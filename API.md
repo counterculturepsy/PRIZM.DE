@@ -47,6 +47,14 @@ Application routes use server components/actions for first-party UI and `/api/v1
 - Only Owner/Admin may conditionally approve the current draft. Approval records reviewer, note, timestamp, version and audit metadata; any revision requires approval again.
 - Print routes render the tenant-scoped immutable snapshot and label it as a proposal rather than an invoice or guarantee. M7 exposes no public link, signature, payment or send endpoint.
 
+## M8 campaign preparation contracts
+
+- Owner/Admin/Sales may create campaign drafts, immutable text templates, ordered steps, and attributed recipient enrollments. Developer/Viewer have read access only. Every mutation rechecks current membership in the service.
+- Campaign creation is idempotent per workspace/request key; conflicting reuse is rejected. Enrollment deduplicates contact and email per campaign. Preparation has a maximum audience of 100 and configurable daily cap of 1–100.
+- Workspace email suppression and do-not-contact flags block enrollment. Readiness/review rechecks both suppression and changed contact email snapshots. Removing enrollment preserves contact/suppression records.
+- Only Owner/Admin may record preparation review with a note, after current readiness passes. Audience/sequence changes clear review. Every mutation is audited without contact values in audit metadata.
+- No sending endpoint, scheduler, unsubscribe endpoint or provider webhook is exposed in this foundation. Delivery readiness always reports missing provider, unsubscribe/bounce and operational controls.
+
 Future JSON responses use `{ data, meta }`; errors use `{ error: { code, message, requestId, fieldErrors? } }`. Never return stack traces, SQL details, secrets, provider payloads, or record existence across a tenant boundary.
 
 Mutations validate content type, body size, origin where appropriate, Zod schema, authenticated membership, capability, rate limit, and idempotency key where retries are possible. Pagination uses opaque cursors. Dates are ISO 8601 UTC. Money is integer minor units plus currency. Externally visible IDs are opaque UUIDs.

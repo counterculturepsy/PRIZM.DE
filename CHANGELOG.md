@@ -6,6 +6,8 @@ All notable changes follow Keep a Changelog. The project has not released a stab
 
 ### Added
 
+- M8 campaign preparation: immutable templates, ordered steps, deduplicated audiences, suppression/readiness checks, privileged human review, audit events and tenant/role regression tests; delivery remains disabled
+
 - M0 architecture, route map, database/tenancy model, design system, security, AI, API, environment, testing, and roadmap documentation
 - Next.js/TypeScript/Tailwind application foundation
 - Drizzle/PostgreSQL auth, workspace, membership, and audit schema

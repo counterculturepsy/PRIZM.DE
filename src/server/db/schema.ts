@@ -872,6 +872,68 @@ export const proposalVersions = pgTable("proposal_versions", {
   foreignKey({ columns: [table.workspaceId, table.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "proposal_versions_workspace_creator_fk" }).onDelete("restrict"),
 ]);
 
+export const campaignStatus = pgEnum("campaign_status", ["draft", "reviewed"]);
+export const campaignTemplates = pgTable("campaign_templates", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), subject: text("subject").notNull(), body: text("body").notNull(),
+  createdByUserId: uuid("created_by_user_id").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  unique("campaign_templates_workspace_id_unique").on(t.workspaceId, t.id),
+  index("campaign_templates_workspace_created_idx").on(t.workspaceId, t.createdAt),
+  check("campaign_templates_length_check", sql`char_length(${t.name}) between 2 and 100 and char_length(${t.subject}) between 2 and 200 and char_length(${t.body}) between 10 and 5000`),
+  foreignKey({ columns: [t.workspaceId, t.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "campaign_templates_creator_fk" }).onDelete("restrict"),
+]);
+export const campaigns = pgTable("campaigns", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  name: text("name").notNull(), requestKey: uuid("request_key").notNull(),
+  status: campaignStatus("status").default("draft").notNull(),
+  dailyRecipientCap: integer("daily_recipient_cap").notNull(),
+  createdByUserId: uuid("created_by_user_id").notNull(),
+  reviewedByUserId: uuid("reviewed_by_user_id"), reviewNote: text("review_note"),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  unique("campaigns_workspace_id_unique").on(t.workspaceId, t.id),
+  uniqueIndex("campaigns_workspace_request_unique").on(t.workspaceId, t.requestKey),
+  index("campaigns_workspace_status_idx").on(t.workspaceId, t.status, t.updatedAt),
+  check("campaigns_cap_check", sql`${t.dailyRecipientCap} between 1 and 100`),
+  check("campaigns_review_check", sql`(${t.status} = 'draft' and ${t.reviewedAt} is null and ${t.reviewedByUserId} is null and ${t.reviewNote} is null) or (${t.status} = 'reviewed' and ${t.reviewedAt} is not null and ${t.reviewedByUserId} is not null and ${t.reviewNote} is not null)`),
+  foreignKey({ columns: [t.workspaceId, t.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "campaigns_creator_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [t.workspaceId, t.reviewedByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "campaigns_reviewer_fk" }).onDelete("restrict"),
+]);
+export const campaignSteps = pgTable("campaign_steps", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  campaignId: uuid("campaign_id").notNull(), templateId: uuid("template_id").notNull(),
+  position: integer("position").notNull(), delayDays: integer("delay_days").notNull(),
+}, (t) => [
+  uniqueIndex("campaign_steps_position_unique").on(t.workspaceId, t.campaignId, t.position),
+  index("campaign_steps_workspace_template_idx").on(t.workspaceId, t.templateId),
+  check("campaign_steps_bounds_check", sql`${t.position} between 1 and 10 and ${t.delayDays} between 0 and 90`),
+  foreignKey({ columns: [t.workspaceId, t.campaignId], foreignColumns: [campaigns.workspaceId, campaigns.id], name: "campaign_steps_campaign_fk" }).onDelete("cascade"),
+  foreignKey({ columns: [t.workspaceId, t.templateId], foreignColumns: [campaignTemplates.workspaceId, campaignTemplates.id], name: "campaign_steps_template_fk" }).onDelete("restrict"),
+]);
+export const campaignRecipients = pgTable("campaign_recipients", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  workspaceId: uuid("workspace_id").notNull().references(() => workspaces.id, { onDelete: "cascade" }),
+  campaignId: uuid("campaign_id").notNull(), contactId: uuid("contact_id").notNull(),
+  normalizedEmail: text("normalized_email").notNull(), contactBasis: text("contact_basis").notNull(),
+  createdByUserId: uuid("created_by_user_id").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => [
+  uniqueIndex("campaign_recipients_contact_unique").on(t.workspaceId, t.campaignId, t.contactId),
+  uniqueIndex("campaign_recipients_email_unique").on(t.workspaceId, t.campaignId, t.normalizedEmail),
+  index("campaign_recipients_workspace_contact_idx").on(t.workspaceId, t.contactId),
+  check("campaign_recipients_basis_check", sql`char_length(${t.contactBasis}) between 10 and 500`),
+  foreignKey({ columns: [t.workspaceId, t.campaignId], foreignColumns: [campaigns.workspaceId, campaigns.id], name: "campaign_recipients_campaign_fk" }).onDelete("cascade"),
+  foreignKey({ columns: [t.workspaceId, t.contactId], foreignColumns: [contacts.workspaceId, contacts.id], name: "campaign_recipients_contact_fk" }).onDelete("restrict"),
+  foreignKey({ columns: [t.workspaceId, t.createdByUserId], foreignColumns: [workspaceMembers.workspaceId, workspaceMembers.userId], name: "campaign_recipients_creator_fk" }).onDelete("restrict"),
+]);
+
 export const schema = {
   users,
   accounts,
@@ -907,4 +969,8 @@ export const schema = {
   aiDraftRuns,
   proposals,
   proposalVersions,
+  campaignTemplates,
+  campaigns,
+  campaignSteps,
+  campaignRecipients,
 };

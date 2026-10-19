@@ -16,6 +16,7 @@ const activeLinks = [
   { href: "/app/ai/strategy", label: "AI strategy", icon: Bot },
   { href: "/app/ai/outreach", label: "Outreach drafts", icon: MessageSquareText },
   { href: "/app/proposals", label: "Proposals", icon: FileText },
+  { href: "/app/campaigns", label: "Campaign preparation", icon: MessageSquareText },
   { href: "/app/settings/profile", label: "Settings", icon: Settings },
 ] as const;
 

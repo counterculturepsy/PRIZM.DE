@@ -35,6 +35,8 @@ PostgreSQL is authoritative. Drizzle migrations are append-only after applicatio
 
 ## Planned domain schema
 
+M8 preparation adds `campaign_templates` (immutable plain text), `campaigns` (draft/reviewed state and cap), `campaign_steps` (unique ordered positions, cumulative delays) and `campaign_recipients` (same-tenant contact plus email snapshot and contact-use basis). Composite keys reject foreign-tenant references. Audience addresses are unique per campaign; changes reset review. Sending/message tables and provider secrets are not part of this migration.
+
 | Domain | Tables | Ownership and key constraints |
 | --- | --- | --- |
 | Profile | `services`, `ideal_customer_profiles`, `onboarding_progress` | implemented; workspace scoped; service slug unique per workspace |

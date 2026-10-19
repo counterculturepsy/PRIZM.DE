@@ -2,7 +2,7 @@
 
 PRIZM.DEV is a workspace-safe client-acquisition operating system for developers and digital agencies. Its product principle is simple: **do not give users more leads; give them better opportunities.**
 
-This repository contains M0 architecture through the M7 versioned-proposal foundation. Database-backed identity, isolated workspaces, onboarding, roles, bounded company imports, provenance, durable audit jobs, bounded static analysis, evidence reports, deterministic opportunity rules, explainable lead scores, tenant-safe CRM, evidence-grounded strategy/outreach drafts, and immutable human-approved proposal snapshots are implemented. The audit worker and AI provider are disabled by default; external discovery, live AI use, outbound outreach, public proposal delivery, signatures, payments, and calendar integrations remain gated capabilities.
+This repository contains M0 architecture through M7 plus the M8 campaign-preparation foundation. Database-backed identity, isolated workspaces, onboarding, roles, bounded company imports, provenance, durable audit jobs, bounded static analysis, evidence reports, deterministic opportunity rules, explainable lead scores, tenant-safe CRM, evidence-grounded strategy/outreach drafts, and immutable human-approved proposal snapshots are implemented. Campaign preparation adds templates, sequence plans, deduplicated recipient enrollments, suppression readiness and human review under `/app/campaigns`; full M8 delivery is still pending. The audit worker and AI provider are disabled by default; external discovery, live AI use, outbound outreach, public proposal delivery, signatures, payments, and calendar integrations remain gated capabilities.
 
 ## Stack
 
